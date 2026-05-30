@@ -25,13 +25,11 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .tree-hint{text-align:center;color:var(--sub);padding:80px 24px;font-size:.95rem;line-height:2.2}
 .tree-hint p:first-child{font-size:1.3rem;font-weight:600;color:var(--ink);margin-bottom:8px}
 .tree-hint em{color:var(--red);font-style:normal;font-weight:700;border-bottom:2px solid var(--gold-light);padding-bottom:1px}
-.family-unit{display:flex;flex-direction:column;align-items:center}
-.couple{display:flex;align-items:center;gap:0}
-.children-branch{display:flex;flex-direction:column;align-items:center}
-.children-row{display:flex;gap:16px;align-items:flex-start;justify-content:center}
-.children-row::before{content:'';position:absolute;top:0;height:2px;background:var(--tree-line);left:45px;right:45px;border-radius:1px}
-.children-row>.family-unit{position:relative;padding-top:24px}
-.children-row>.family-unit::before{content:'';position:absolute;top:0;left:50%;width:2px;height:24px;background:var(--tree-line);transform:translateX(-50%);border-radius:1px}
+.tree-table{border-collapse:collapse;border-spacing:0;margin:0 auto}
+.tree-cell{vertical-align:top;text-align:center;padding:0 8px}
+.couple{display:flex;align-items:center;justify-content:center;gap:0}
+.tree-connector{display:flex;justify-content:center;height:28px}
+.tree-vline{width:2px;height:100%;background:var(--tree-line);border-radius:1px}
 .node{padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--radius-md);background:linear-gradient(180deg,var(--paper) 0%,var(--paper-alt) 100%);text-align:center;cursor:pointer;transition:all .25s var(--ease);min-width:90px;max-width:180px;position:relative;box-shadow:var(--shadow-sm);user-select:none}
 .node:hover{border-color:var(--red-light);box-shadow:var(--shadow-lg);transform:translateY(-3px)}
 .node:focus{outline:2px solid var(--red);outline-offset:3px}
@@ -140,7 +138,7 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
   .node .name{font-size:.8rem}
   .node .node-gen{font-size:.5rem}
   .node .info{font-size:.6rem}
-  .children-row{gap:8px}
+  .tree-cell{padding:0 4px}
   .spouse-line{width:12px}
   .llm-panel{width:calc(100vw - 16px);right:8px;bottom:8px;max-height:70vh}
   .llm-body{max-height:45vh}
@@ -651,25 +649,32 @@ function renderTree(){
   var roots=[];
   D.mem.forEach(function(m){if(!m.fa&&!m.mo)roots.push(m)});
   roots.sort(function(a,b){return a.gen-b.gen});
-  var h='';
+  var h='<table class="tree-table"><tr>';
   roots.forEach(function(r){h+=renderFamily(r)});
+  h+='</tr></table>';
   el.innerHTML=h;
 }
 
 function renderFamily(m){
   var ch=getCh(m),sp=getSp(m);
-  var h='<div class="family-unit">';
-  h+='<div class="couple">';
-  h+=renderNode(m);
-  if(sp){h+='<div class="spouse-line"></div>'+renderNode(sp)}
-  h+='</div>';
-  if(ch.length){
-    h+='<div class="children-branch"><div class="children-line"></div><div class="children-row">';
-    ch.forEach(function(c){h+=renderFamily(c)});
-    h+='</div></div>';
+  if(!ch.length){
+    var s='<td class="tree-cell">';
+    s+='<div class="couple">';
+    s+=renderNode(m);
+    if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp);
+    s+='</div></td>';
+    return s;
   }
-  h+='</div>';
-  return h;
+  var s='<td class="tree-cell">';
+  s+='<table class="tree-table"><tr>';
+  ch.forEach(function(c){s+=renderFamily(c)});
+  s+='</tr></table>';
+  s+='<div class="tree-connector"><div class="tree-vline"></div></div>';
+  s+='<div class="couple">';
+  s+=renderNode(m);
+  if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp);
+  s+='</div></td>';
+  return s;
 }
 function handleNodeKey(e,id){if(e.key==='Enter')selectNode(id)}
 function renderNode(m){
