@@ -28,7 +28,7 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .tree-table{border-collapse:collapse;border-spacing:0;margin:0 auto}
 .tree-cell{vertical-align:top;text-align:center;padding:0 8px}
 .couple{display:flex;align-items:center;justify-content:center;gap:0}
-.tree-connector{display:flex;justify-content:center;height:28px}
+.tree-connector{display:flex;justify-content:center;height:28px}.tree-children{position:relative}.tree-children::before{content:"";position:absolute;top:0;left:10%;right:10%;height:2px;background:var(--tree-line)}
 .tree-vline{width:2px;height:100%;background:var(--tree-line);border-radius:1px}
 .node{padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--radius-md);background:linear-gradient(180deg,var(--paper) 0%,var(--paper-alt) 100%);text-align:center;cursor:pointer;transition:all .25s var(--ease);min-width:90px;max-width:180px;position:relative;box-shadow:var(--shadow-sm);user-select:none}
 .node:hover{border-color:var(--red-light);box-shadow:var(--shadow-lg);transform:translateY(-3px)}
@@ -666,14 +666,15 @@ function renderFamily(m){
     return s;
   }
   var s='<td class="tree-cell">';
-  s+='<table class="tree-table"><tr>';
-  ch.forEach(function(c){s+=renderFamily(c)});
-  s+='</tr></table>';
-  s+='<div class="tree-connector"><div class="tree-vline"></div></div>';
   s+='<div class="couple">';
   s+=renderNode(m);
   if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp);
-  s+='</div></td>';
+  s+='</div>';
+  s+='<div class="tree-connector"><div class="tree-vline"></div></div>';
+  s+='<div class="tree-children"><table class="tree-table"><tr>';
+  ch.forEach(function(c){s+=renderFamily(c)});
+  s+='</tr></table></div>';
+  s+='</td>';
   return s;
 }
 function handleNodeKey(e,id){if(e.key==='Enter')selectNode(id)}
