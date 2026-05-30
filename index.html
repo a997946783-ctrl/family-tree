@@ -129,7 +129,7 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
   .topbar .actions.show button{padding:12px 16px;text-align:left;border-bottom:1px solid var(--line-light);font-size:.85rem}
   .topbar .actions.show button:last-child{border-bottom:none}
   .menu-btn{display:flex!important}
-  .search-box{display:none}
+  .search-box{margin-right:4px}.search-box input{width:80px;font-size:.75rem;padding:5px 8px}
   .app{flex-direction:column}
   .tree-panel{flex:1;overflow:auto;padding:12px;touch-action:none}
   .tree-container{transform-origin:0 0;min-width:fit-content}
@@ -517,10 +517,11 @@ function expWord(){
   body+='</td></tr><tr><td>总人数</td><td>'+D.mem.length+'人</td></tr>';
   body+='<tr><td>世代</td><td>共'+mx+'世</td></tr></table>';
   for(var g=1;g<=mx;g++){
-    var males=[];D.mem.forEach(function(m){if(m.gen===g&&m.g==='male')males.push(m)});
-    if(!males.length)continue;
-    body+='<div class="gen-title">第'+genN(g)+'世'+(g===1?'（始祖）':'')+'</div>';
-    males.forEach(function(male){
+    var gMembers=[];D.mem.forEach(function(m){if(m.gen===g)gMembers.push(m)});
+    if(!gMembers.length)continue;
+    gMembers.sort(function(a,b){return(a.od||99)-(b.od||99)});
+    body+='<div class="gen-title">第'+genN(g)+'世 ('+gMembers.length+'人)</div>';
+    gMembers.forEach(function(male){
       var sp=getSp(male),ch=getCh(male);
       var sons=[],dgs=[];ch.forEach(function(c){if(c.g==='male')sons.push(c);else dgs.push(c)});
       var t='';
@@ -757,7 +758,7 @@ function showEdit(m){
   h+='<div class="fi"><label>配偶</label><select id="ed-sp"><option value="">--</option>';
   D.mem.forEach(function(p){if(p.id!==m.id&&((m.g==='male'&&p.g==='female')||(m.g==='female'&&p.g==='male')))h+='<option value="'+p.id+'"'+(m.sp&&m.sp[0]===p.id?' selected':'')+'>'+esc(p.name)+'</option>'});
   h+='</select></div>';
-  h+='<div class="fi"><label>排行</label><select id="ed-od"><option value="">--</option><option value="1"'+(m.od===1?' selected':'')+'>长</option><option value="2"'+(m.od===2?' selected':'')+'>次</option><option value="3"'+(m.od===3?' selected':'')+'>三</option></select></div>';
+  h+='<div class="fi"><label>排行</label><select id="ed-od"><option value="">--</option><option value="1"'+(m.od===1?' selected':'')+'>长</option><option value="2"'+(m.od===2?' selected':'')+'>次</option><option value="3"'+(m.od===3?' selected':'')+'>三</option><option value="4"'+(m.od===4?' selected':'')+'>四</option><option value="5"'+(m.od===5?' selected':'')+'>五</option><option value="6"'+(m.od===6?' selected':'')+'>六</option><option value="7"'+(m.od===7?' selected':'')+'>七</option><option value="8"'+(m.od===8?' selected':'')+'>八</option><option value="9"'+(m.od===9?' selected':'')+'>九</option><option value="10"'+(m.od===10?' selected':'')+'>十</option></select></div>';
   h+='<div class="fi"><label>葭地</label><input id="ed-bu" value="'+esc(m.bu||'')+'"></div>';
   h+='<div class="fi"><label>照片URL</label><input id="ed-ph" value="'+esc(m.ph||'')+'"></div>';
   h+='<div class="fi full"><label>备注</label><textarea id="ed-nt" rows="3">'+esc(m.nt||'')+'</textarea></div>';
@@ -872,9 +873,14 @@ function showEvents(m){
   var evs=(D.ev||[]).filter(function(e){return e.mid===m.id});
   var h='';
   if(!evs.length)h='<p style="color:var(--sub);font-size:.85rem;text-align:center;padding:20px">暂无事件记录</p>';
-  else evs.forEach(function(e){h+='<div class="event-item"><div class="event-date">'+esc(e.d)+'</div><div>'+esc(e.e)+'</div></div>'});
+  else evs.forEach(function(e,idx){h+='<div class="event-item"><div class="event-date">'+esc(e.d)+'</div><div style="flex:1">'+esc(e.e)+'</div><button onclick="delEvent('+idx+',\''+m.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--sub-light);font-size:.8rem" title="删除">×</button></div>'});
   h+='<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="addEvent(\''+m.id+'\')">➕ 添加事件</button></div>';
   el.innerHTML=h;
+}
+function delEvent(idx,mid){
+  if(!confirm('删除此事件？'))return;
+  D.ev.splice(idx,1);
+  saveData();showEvents(find(mid));toast('已删除');
 }
 function addEvent(mid){
   var d=prompt('日期(如 2024-01-15):');
