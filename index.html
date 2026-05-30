@@ -1269,6 +1269,25 @@ function initTouchZoom(){
       applyTransform();
     }
   },{passive:false});
+  
+  // Desktop: mouse drag to pan
+  var _dragging=false,_dragStart={x:0,y:0};
+  panel.addEventListener('mousedown',function(e){
+    if(e.target.closest('.node,.quick-add,button,a,input,select,textarea'))return;
+    _dragging=true;
+    _dragStart={x:e.clientX-_panX,y:e.clientY-_panY};
+    panel.style.cursor='grabbing';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!_dragging)return;
+    _panX=e.clientX-_dragStart.x;
+    _panY=e.clientY-_dragStart.y;
+    applyTransform();
+  });
+  document.addEventListener('mouseup',function(){
+    if(_dragging){_dragging=false;panel.style.cursor=''}
+  });
 }
 
 // ==================== Print Templates ====================
