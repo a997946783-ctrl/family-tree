@@ -121,7 +121,36 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .s-row input,.s-row select{flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:.82rem;font-family:inherit}
 .s-row input:focus,.s-row select:focus{outline:none;border-color:var(--red-mid)}
 .tp{background:var(--paper-alt);border-left:2px solid var(--gold-light);padding:10px 14px;margin:10px 0;font-size:.82rem;color:var(--sub);border-radius:0 var(--radius) var(--radius) 0}
-@media(max-width:900px){.app{flex-direction:column}.side-panel{width:100%!important;max-height:50vh;border-left:none;border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.06)}.side-panel.collapsed{max-height:0}.tree-panel{padding:20px 16px}.children-row{flex-direction:column;align-items:center;gap:16px}.children-row::before{display:none}.children-row>.family-unit::before{display:none}.children-line{height:16px}.couple{flex-direction:column;gap:6px}.spouse-line{width:2.5px;height:16px}.topbar .actions button{padding:8px 8px;font-size:.78rem}.topbar h1{font-size:1rem;letter-spacing:.2em;padding:0 16px}.llm-panel{width:calc(100vw - 24px);right:12px;bottom:12px}.search-box input{width:100px}.search-box input:focus{width:140px}.modal{padding:20px;max-height:90vh}.node{padding:10px 14px;min-width:70px;max-width:140px}.node .name{font-size:.85rem}.node .node-gen{font-size:.55rem}}
+@media(max-width:900px){
+  .topbar{height:48px}
+  .topbar h1{font-size:.95rem;letter-spacing:.15em;padding:0 12px}
+  .topbar .actions{display:none}
+  .topbar .actions.show{display:flex;position:absolute;top:48px;right:0;background:var(--paper);border:1px solid var(--border);border-radius:0 0 0 var(--radius-md);box-shadow:var(--shadow-lg);flex-direction:column;z-index:101;min-width:140px}
+  .topbar .actions.show button{padding:12px 16px;text-align:left;border-bottom:1px solid var(--line-light);font-size:.85rem}
+  .topbar .actions.show button:last-child{border-bottom:none}
+  .menu-btn{display:flex!important}
+  .search-box{display:none}
+  .app{flex-direction:column}
+  .tree-panel{flex:1;overflow:auto;padding:12px;touch-action:pan-x pan-y pinch-zoom}
+  .tree-container{transform-origin:0 0;min-width:fit-content}
+  .side-panel{width:100%!important;max-height:55vh;border-left:none;border-top:1px solid var(--border);box-shadow:0 -4px 20px rgba(0,0,0,.06);position:relative}
+  .side-panel.collapsed{max-height:0;border:none}
+  .node{padding:8px 12px;min-width:60px;max-width:120px}
+  .node .name{font-size:.8rem}
+  .node .node-gen{font-size:.5rem}
+  .node .info{font-size:.6rem}
+  .children-row{gap:8px}
+  .spouse-line{width:12px}
+  .llm-panel{width:calc(100vw - 16px);right:8px;bottom:8px;max-height:70vh}
+  .llm-body{max-height:45vh}
+  .modal{padding:16px;max-height:92vh;width:96%}
+  .tpl-card{padding:12px}
+  .tpl-icon{font-size:1.4rem}
+  .zoom-controls{display:flex!important}
+}
+.zoom-controls{display:none;position:fixed;bottom:80px;right:16px;flex-direction:column;gap:6px;z-index:130}
+.zoom-controls button{width:40px;height:40px;border-radius:50%;background:var(--paper);border:1.5px solid var(--border);font-size:1.2rem;cursor:pointer;box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center}
+.menu-btn{display:none;background:none;border:none;color:rgba(255,255,255,.7);font-size:1.3rem;padding:8px;cursor:pointer}
 @media print{
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
   body{background:#fff!important;font-size:12pt}
@@ -145,9 +174,14 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 </style>
 </head>
 <body>
-<div class="topbar"><h1 id="ttl">家谱</h1><div class="spacer"></div><div class="search-box"><input type="text" id="searchInput" placeholder="🔍 搜索..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('')}"></div><span id="syncBadge" style="font-size:.72rem;margin-right:8px;opacity:.8"></span><input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(this)"><input type="file" id="importDocInput" accept=".docx,.txt,.pdf" style="display:none" onchange="handleImportDoc(this)"><div class="actions"><button onclick="pickImportFile()" title="从文件导入">📥 导入</button><button onclick="document.getElementById('importDocInput').click()" title="导入 Word 文档">📄 导入文档</button><button onclick="pickSaveFile()" title="关联文件自动同步">💾 同步</button><button onclick="showRecordsModal()">📖 齿录</button><button onclick="showStatsModal()">📊 统计</button><button onclick="showEventsModal()">📅 大事记</button><button onclick="showExportModal()">📤 导出</button><button onclick="showSettingsModal()">⚙️</button></div></div>
+<div class="topbar"><h1 id="ttl">家谱</h1><div class="spacer"></div><div class="search-box"><input type="text" id="searchInput" placeholder="🔍 搜索..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('')}"></div><span id="syncBadge" style="font-size:.72rem;margin-right:8px;opacity:.8"></span><input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(this)"><input type="file" id="importDocInput" accept=".docx,.txt,.pdf" style="display:none" onchange="handleImportDoc(this)"><button class="menu-btn" onclick="toggleMenu()">☰</button><div class="actions"><button onclick="pickImportFile()" title="从文件导入">📥 导入</button><button onclick="document.getElementById('importDocInput').click()" title="导入 Word 文档">📄 导入文档</button><button onclick="pickSaveFile()" title="关联文件自动同步">💾 同步</button><button onclick="showRecordsModal()">📖 齿录</button><button onclick="showStatsModal()">📊 统计</button><button onclick="showEventsModal()">📅 大事记</button><button onclick="showExportModal()">📤 导出</button><button onclick="showSettingsModal()">⚙️</button></div></div>
 <div class="app"><div class="tree-panel" id="treePanel"><div class="print-title" id="printTitle"></div><div class="print-subtitle" id="printSubtitle"></div><div class="tree-container" id="treeContainer"></div></div><div class="side-panel collapsed" id="sidePanel"><div id="panelContent"></div></div></div>
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()"><div class="modal"><button class="close-btn" onclick="closeModal()">&times;</button><div id="modalBody"></div></div></div>
+<div class="zoom-controls" id="zoomControls">
+  <button onclick="zoomTree(1.2)" title="放大">＋</button>
+  <button onclick="zoomTree(0.8)" title="缩小">－</button>
+  <button onclick="resetZoom()" title="重置">⟳</button>
+</div>
 <div class="toast" id="toast"></div>
 <button class="llm-fab" id="llmFab" onclick="toggleLLM()" title="AI 助手">🧠</button>
 <div class="llm-panel" id="llmPanel"><div class="llm-header"><span>🧠 AI 助手</span><div style="display:flex;align-items:center;gap:6px"><select class="llm-psel" id="llmProv" onchange="switchProv()"></select><button onclick="document.getElementById('docFile').click()" title="上传文档">📄</button><button onclick="checkGrammar()" title="数据检查">🔍</button><button onclick="toggleLLM()">&times;</button></div></div><input type="file" id="docFile" accept=".pdf,.docx" style="display:none" onchange="parseDoc(this)"><div class="llm-body" id="llmBody"></div><div class="llm-input"><textarea id="llmIn" placeholder="输入问题..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLLM()}"></textarea><button onclick="sendLLM()">发送</button></div></div>
@@ -1130,6 +1164,88 @@ async function checkGrammar(){
   if(ans)addMsg('ai','\n🤖 AI 分析：\n'+ans);
 }
 
+// ==================== Mobile Zoom/Pan ====================
+var _zoom=1,_panX=0,_panY=0,_touchStart=null,_pinchDist=null;
+
+function toggleMenu(){
+  var acts=document.querySelector('.actions');
+  acts.classList.toggle('show');
+  // Close on outside click
+  if(acts.classList.contains('show')){
+    setTimeout(function(){
+      var handler=function(e){
+        if(!acts.contains(e.target)&&!e.target.classList.contains('menu-btn')){
+          acts.classList.remove('show');
+          document.removeEventListener('click',handler);
+        }
+      };
+      document.addEventListener('click',handler);
+    },10);
+  }
+}
+
+function applyTransform(){
+  var c=document.getElementById('treeContainer');
+  if(c)c.style.transform='translate('+_panX+'px,'+_panY+'px) scale('+_zoom+')';
+}
+
+function zoomTree(factor){
+  _zoom=Math.max(0.3,Math.min(3,_zoom*factor));
+  applyTransform();
+}
+
+function resetZoom(){
+  _zoom=1;_panX=0;_panY=0;
+  applyTransform();
+}
+
+function initTouchZoom(){
+  var panel=document.getElementById('treePanel');
+  if(!panel)return;
+  
+  panel.addEventListener('touchstart',function(e){
+    if(e.touches.length===2){
+      var dx=e.touches[0].clientX-e.touches[1].clientX;
+      var dy=e.touches[0].clientY-e.touches[1].clientY;
+      _pinchDist=Math.sqrt(dx*dx+dy*dy);
+      e.preventDefault();
+    }else if(e.touches.length===1&&_zoom>1){
+      _touchStart={x:e.touches[0].clientX-_panX,y:e.touches[0].clientY-_panY};
+    }
+  },{passive:false});
+  
+  panel.addEventListener('touchmove',function(e){
+    if(e.touches.length===2&&_pinchDist){
+      var dx=e.touches[0].clientX-e.touches[1].clientX;
+      var dy=e.touches[0].clientY-e.touches[1].clientY;
+      var dist=Math.sqrt(dx*dx+dy*dy);
+      var factor=dist/_pinchDist;
+      _zoom=Math.max(0.3,Math.min(3,_zoom*factor));
+      _pinchDist=dist;
+      applyTransform();
+      e.preventDefault();
+    }else if(e.touches.length===1&&_touchStart){
+      _panX=e.touches[0].clientX-_touchStart.x;
+      _panY=e.touches[0].clientY-_touchStart.y;
+      applyTransform();
+      e.preventDefault();
+    }
+  },{passive:false});
+  
+  panel.addEventListener('touchend',function(){
+    _touchStart=null;_pinchDist=null;
+  });
+  
+  // Mouse wheel zoom for desktop
+  panel.addEventListener('wheel',function(e){
+    if(e.ctrlKey){
+      e.preventDefault();
+      var factor=e.deltaY>0?0.9:1.1;
+      zoomTree(factor);
+    }
+  },{passive:false});
+}
+
 // ==================== Print Templates ====================
 function printTemplate(type){
   if(!D.mem.length){toast('暂无数据');return}
@@ -1373,5 +1489,6 @@ initProvUI();
 renderTree();
 updateSyncStatus();
 restoreFileHandle();
+initTouchZoom();
 document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.key==='z'){e.preventDefault();undoDelete()}});</script></body>
 </html>
