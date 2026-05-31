@@ -546,17 +546,21 @@ function expWord(){
       if(m2.g==='female'){
         t+=m2.name+'，';
         if(m2.cy)t+='字'+m2.cy+'。';
-        if(m2.bi)t+='生于公元'+m2.bi+'年';
-        if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
-        t+='。';
+        if(m2.bi||m2.de){
+          if(m2.bi)t+='生于公元'+m2.bi+'年';
+          if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
+          t+='。';
+        }
         if(sp){t+='适'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。';}
       }else{
         if(g===1)t+='讳'+m2.name+'，';
         else{var o='';if(m2.od===1)o='长房';else if(m2.od===2)o='次房';t+=(o?o+' ':'')+m2.name+'，'}
         if(m2.cy)t+='字'+m2.cy+'。';
-        if(m2.bi)t+='生于公元'+m2.bi+'年';
-        if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
-        t+='。';
+        if(m2.bi||m2.de){
+          if(m2.bi)t+='生于公元'+m2.bi+'年';
+          if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
+          t+='。';
+        }
         if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
         if(sons.length){t+='子'+nCN(sons.length)+'：';sons.forEach(function(s,i){if(i>0)t+='，';t+=(i===0?'长':'次')+s.name});t+='。'}
         if(dgs.length){t+='女'+nCN(dgs.length)+'：';dgs.forEach(function(d,i){if(i>0)t+='，';t+=d.name});t+='。'}
@@ -967,9 +971,11 @@ function showRecord(m){
     else{var o='';if(m.od===1)o='长房';else if(m.od===2)o='次房';t+=(o?o+' ':'')+m.name+'，'}
   }
   if(m.cy)t+='字'+m.cy+'。';
-  if(m.bi)t+='生于公元'+m.bi+'年';
-  if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
-  t+='。';
+  if(m.bi||m.de){
+    if(m.bi)t+='生于公元'+m.bi+'年';
+    if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
+    t+='。';
+  }
   if(m.g==='female'){
     if(sp){t+='适'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
   }else{
@@ -1037,9 +1043,11 @@ function showRecordsModal(){
         t+=m2.name+'，';
       }
       if(m2.cy)t+='字'+m2.cy+'。';
-      if(m2.bi)t+='生于公元'+m2.bi+'年';
-      if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
-      t+='。';
+      if(m2.bi||m2.de){
+        if(m2.bi)t+='生于公元'+m2.bi+'年';
+        if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
+        t+='。';
+      }
       if(m2.g==='female'){
         if(sp){t+='适'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
       }else{
@@ -1777,9 +1785,11 @@ function tplRecord(css,tt,sub){
         else{var o='';if(m.od===1)o='长房';else if(m.od===2)o='次房';t+=(o?o+' ':'')+m.name+'，'}
       }else{t+=m.name+'，'}
       if(m.cy)t+='字'+m.cy+'。';
-      if(m.bi)t+='生于公元'+m.bi+'年';
-      if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
-      t+='。';
+      if(m.bi||m.de){
+        if(m.bi)t+='生于公元'+m.bi+'年';
+        if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
+        t+='。';
+      }
       if(sp){t+=(m.g==='female'?'适':'配')+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
       if(sons.length){t+='子'+nCN(sons.length)+'：';sons.forEach(function(s,i){if(i>0)t+='，';t+=(i===0?'长':'次')+s.name});t+='。'}
       if(dgs.length){t+='女'+nCN(dgs.length)+'：';dgs.forEach(function(d,i){if(i>0)t+='，';t+=d.name});t+='。'}
