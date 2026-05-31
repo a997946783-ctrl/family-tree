@@ -659,6 +659,7 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 // ==================== Tree Rendering ====================
 function renderTree(){
+  if(_posDragging)return; // skip re-render during position drag
   var el=document.getElementById('treeContainer');
   var tt=D.set.tt||'家谱';
   document.getElementById('ttl').textContent=tt;
@@ -700,7 +701,7 @@ function renderFamily(m){
 function handleNodeKey(e,id){if(e.key==='Enter')selectNode(id)}
 function renderNode(m,hasCh,isCollapsed,familyId){
   var dragId=familyId||m.id;
-  var tf=(m.ox!=null||m.oy!=null)?' style="position:fixed;left:'+(m.ox||0)+'px;top:'+(m.oy||0)+'px;z-index:9999"':'';
+  var tf=(m.ox||m.oy)?' style="transform:translate('+(m.ox||0)+'px,'+(m.oy||0)+'px)"':'';
   return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" data-id="'+dragId+'"'+tf+' tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
     +'<div class="node-gen">'+genN(m.gen)+'世</div>'
     +'<div class="name">'+esc(m.name)+'</div>'
@@ -1292,7 +1293,7 @@ function resetPositions(){D.mem.forEach(function(m){delete m.ox;delete m.oy});sa
 
 // ==================== Drag & Drop ====================
 var _dragFrom=null,_dragLine=null,_dragMoved=false;
-var _posDrag=null; // {id,startX,startY,ox,oy}
+var _posDrag=null,_posDragging=false; // position drag state
 function initDrag(){
   document.addEventListener("mousedown",function(e){
     var node=e.target.closest(".node");
@@ -1300,10 +1301,10 @@ function initDrag(){
     var id=node.dataset.id;if(!id)return;
     if(e.shiftKey){
       var m=find(id);if(!m)return;
-      var rect=node.getBoundingClientRect();
-      var c=document.getElementById('treeContainer').getBoundingClientRect();
-      _posDrag={id:id,startX:e.clientX,startY:e.clientY,ox:rect.left-c.left,oy:rect.top-c.top};
+      _posDrag={id:id,startX:e.clientX,startY:e.clientY,ox:m.ox||0,oy:m.oy||0};
+      _posDragging=true;
       node.style.cursor='grabbing';
+      node.style.zIndex='9999';
       e.preventDefault();return;
     }
     _dragFrom=id;_dragMoved=false;node.classList.add("dragging");
@@ -1320,9 +1321,9 @@ function initDrag(){
     if(_posDrag){
       var m=find(_posDrag.id);if(!m)return;
       var node=document.querySelector('.node[data-id="'+_posDrag.id+'"]');
-      m.ox=Math.round(_posDrag.ox+(e.clientX-_posDrag.startX));
-      m.oy=Math.round(_posDrag.oy+(e.clientY-_posDrag.startY));
-      if(node){node.style.position='fixed';node.style.left=m.ox+'px';node.style.top=m.oy+'px';node.style.zIndex='9999'}
+      m.ox=_posDrag.ox+(e.clientX-_posDrag.startX);
+      m.oy=_posDrag.oy+(e.clientY-_posDrag.startY);
+      if(node)node.style.transform='translate('+m.ox+'px,'+m.oy+'px)';
       return;
     }
     if(!_dragFrom||!_dragLine)return;
@@ -1338,8 +1339,8 @@ function initDrag(){
     if(_posDrag){
       saveData();
       var node=document.querySelector('.node[data-id="'+_posDrag.id+'"]');
-      if(node)node.style.cursor='';
-      _posDrag=null;return;
+      if(node){node.style.cursor='';node.style.zIndex=''}
+      _posDrag=null;_posDragging=false;return;
     }
     document.querySelectorAll(".node.dragging").forEach(function(el){el.classList.remove("dragging")});
     document.querySelectorAll(".node.drag-over").forEach(function(el){el.classList.remove("drag-over")});
