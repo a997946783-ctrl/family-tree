@@ -463,7 +463,7 @@ function parseGenealogyText(text){
     if(fosterMatch){
       fosterMatch[1].split(/[、，,]/).forEach(function(s){
         s=cleanName(s.trim());
-        if(s&&s.length>=1&&s.length<=4)sons.push(s);
+        if(s&&s.length>=1)sons.push(s);
       });
     }
     
@@ -471,11 +471,11 @@ function parseGenealogyText(text){
     
     // Add children
     sons.forEach(function(sn,idx){
-      if(sn.length<1||sn.length>4)return;
+      if(sn.length<1)return;
       members.push({name:sn,cy:'',g:'male',gen:currentGen+1,bi:'',de:'',bu:'',fa:name,mo:m.spName||null,sp:[],od:idx+1,ph:'',nt:''});
     });
     daughters.forEach(function(dg,idx){
-      if(dg.length<1||dg.length>4)return;
+      if(dg.length<1)return;
       members.push({name:dg,cy:'',g:'female',gen:currentGen+1,bi:'',de:'',bu:'',fa:name,mo:m.spName||null,sp:[],od:sons.length+idx+1,ph:'',nt:''});
     });
   }
@@ -682,7 +682,7 @@ function renderFamily(m){
   var s='<div class="'+cls+'">';
   s+='<div class="tree-node-wrap"><div class="couple">';
   s+=renderNode(m,ch.length>0,isCollapsed);
-  if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp);
+  if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp,false,false,m.id);
   s+='</div></div>';
   if(hasKids){
     s+='<div class="tree-children">';
@@ -693,8 +693,9 @@ function renderFamily(m){
   return s;
 }
 function handleNodeKey(e,id){if(e.key==='Enter')selectNode(id)}
-function renderNode(m,hasCh,isCollapsed){
-  return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
+function renderNode(m,hasCh,isCollapsed,familyId){
+  var dragId=familyId||m.id;
+  return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" data-id="'+dragId+'" tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
     +'<div class="node-gen">'+genN(m.gen)+'世</div>'
     +'<div class="name">'+esc(m.name)+'</div>'
     +'<div class="info">'+(m.bi?(m.bi+(m.de?'—'+m.de:'')):(m.de?m.de:''))+'</div>'
@@ -892,13 +893,21 @@ function showRecord(m){
   var sons=[],dgs=[];
   ch.forEach(function(c){if(c.g==='male')sons.push(c);else dgs.push(c)});
   var t='';
-  if(m.gen===1)t+='讳'+m.name+'，';
-  else{var o='';if(m.od===1)o='长房';else if(m.od===2)o='次房';t+=(o?o+' ':'')+m.name+'，'}
+  if(m.g==='female'){
+    t+=m.name+'，';
+  }else{
+    if(m.gen===1)t+='讳'+m.name+'，';
+    else{var o='';if(m.od===1)o='长房';else if(m.od===2)o='次房';t+=(o?o+' ':'')+m.name+'，'}
+  }
   t+=m.cy?'字'+m.cy+'。':'。';
   if(m.bi)t+='生于公元'+m.bi+'年';
   if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
   t+='。';
-  if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+  if(m.g==='female'){
+    if(sp){t+='适'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+  }else{
+    if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+  }
   if(sons.length)t+='子'+nCN(sons.length)+'：';
   sons.forEach(function(s,i){if(i>0)t+='，';t+=(i===0?'长':'次')+s.name});
   if(sons.length)t+='。';
@@ -1059,7 +1068,7 @@ function addMsg(role,text){
   var el=document.getElementById('llmBody');
   var d=document.createElement('div');
   d.className='llm-msg '+role;
-  d.textContent=text;
+  d.innerHTML=text;
   el.appendChild(d);
   el.scrollTop=el.scrollHeight;
   return d;
