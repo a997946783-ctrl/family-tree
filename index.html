@@ -42,6 +42,8 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .node .quick-add{position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:20px;height:20px;border-radius:50%;background:var(--red);color:#fff;border:2px solid var(--paper);font-size:12px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;z-index:2;box-shadow:0 2px 6px rgba(122,30,30,.3);transition:transform .2s}
 .node:hover .quick-add{display:flex}
 .node .quick-add:hover{transform:translateX(-50%) scale(1.15)}
+.collapse-toggle{position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#fff;border:2px solid var(--paper);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;box-shadow:0 1px 4px rgba(139,105,20,.3);line-height:1;padding:0;transition:all .2s}
+.collapse-toggle:hover{background:var(--gold-light);transform:scale(1.15)}
 .spouse-line{width:24px;height:2.5px;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;opacity:.7}
 
 
@@ -170,20 +172,24 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
   .print-subtitle{display:block!important;text-align:center;font-size:10pt;color:#666;margin-bottom:24px;letter-spacing:.1em}
 }
 .print-title,.print-subtitle{display:none}
+.ic{display:inline-flex;align-items:center;justify-content:center;width:1em;height:1em;vertical-align:-0.125em;line-height:1}.ic svg{width:1em;height:1em;flex-shrink:0}.dot{display:inline-block;width:.6em;height:.6em;border-radius:50%;vertical-align:0em;margin:0 .15em}
 </style>
 </head>
 <body>
-<div class="topbar"><h1 id="ttl">家谱</h1><div class="spacer"></div><div class="search-box"><input type="text" id="searchInput" placeholder="🔍 搜索..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('')}"></div><span id="syncBadge" style="font-size:.72rem;margin-right:8px;opacity:.8"></span><input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(this)"><input type="file" id="importDocInput" accept=".docx,.txt,.pdf" style="display:none" onchange="handleImportDoc(this)"><button class="menu-btn" onclick="toggleMenu()">☰</button><div class="actions"><button onclick="pickImportFile()" title="从文件导入">📥 导入</button><button onclick="document.getElementById('importDocInput').click()" title="导入 Word 文档">📄 导入文档</button><button onclick="pickSaveFile()" title="关联文件自动同步">💾 同步</button><button onclick="showRecordsModal()">📖 齿录</button><button onclick="showStatsModal()">📊 统计</button><button onclick="showEventsModal()">📅 大事记</button><button onclick="showExportModal()">📤 导出</button><button onclick="showSettingsModal()">⚙️</button></div></div>
+<div class="topbar"><h1 id="ttl">家谱</h1><div class="spacer"></div><div class="search-box"><input type="text" id="searchInput" placeholder="搜索..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('')}"></div><span id="syncBadge" style="font-size:.72rem;margin-right:8px;opacity:.8"></span><input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(this)"><input type="file" id="importDocInput" accept=".docx,.txt,.pdf" style="display:none" onchange="handleImportDoc(this)"><button class="menu-btn" onclick="toggleMenu()">☰</button><div class="actions"><button onclick="pickImportFile()" title="从文件导入"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> 导入</button><button onclick="document.getElementById('importDocInput').click()" title="导入 Word 文档"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> 导入文档</button><button onclick="pickSaveFile()" title="关联文件自动同步"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span> 同步</button><button onclick="showRecordsModal()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span> 齿录</button><button onclick="showStatsModal()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> 统计</button><button onclick="showEventsModal()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> 大事记</button><button onclick="showExportModal()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> 导出</button><button onclick="showSettingsModal()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span></button></div></div>
 <div class="app"><div class="tree-panel" id="treePanel"><div class="print-title" id="printTitle"></div><div class="print-subtitle" id="printSubtitle"></div><div class="tree-container" id="treeContainer"></div></div><div class="side-panel collapsed" id="sidePanel"><div id="panelContent"></div></div></div>
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()"><div class="modal"><button class="close-btn" onclick="closeModal()">&times;</button><div id="modalBody"></div></div></div>
 <div class="zoom-controls" id="zoomControls">
   <button onclick="zoomTree(1.2)" title="放大">＋</button>
   <button onclick="zoomTree(0.8)" title="缩小">－</button>
   <button onclick="resetZoom()" title="重置">⟳</button>
+  <button onclick="fitWidth()" title="适配宽度">⇔</button>
+  <button onclick="collapseAll()" title="全部收起">⊟</button>
+  <button onclick="expandAll()" title="全部展开">⊞</button>
 </div>
 <div class="toast" id="toast"></div>
-<button class="llm-fab" id="llmFab" onclick="toggleLLM()" title="AI 助手">🧠</button>
-<div class="llm-panel" id="llmPanel"><div class="llm-header"><span>🧠 AI 助手</span><div style="display:flex;align-items:center;gap:6px"><select class="llm-psel" id="llmProv" onchange="switchProv()"></select><button onclick="document.getElementById('docFile').click()" title="上传文档">📄</button><button onclick="checkGrammar()" title="数据检查">🔍</button><button onclick="toggleLLM()">&times;</button></div></div><input type="file" id="docFile" accept=".pdf,.docx" style="display:none" onchange="parseDoc(this)"><div class="llm-body" id="llmBody"></div><div class="llm-input"><textarea id="llmIn" placeholder="输入问题..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLLM()}"></textarea><button onclick="sendLLM()">发送</button></div></div>
+<button class="llm-fab" id="llmFab" onclick="toggleLLM()" title="AI 助手"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2a5.5 5.5 0 0 0-4.9 8H4a2 2 0 0 0-2 2v1a9 9 0 0 0 18 0v-1a2 2 0 0 0-2-2h-.6a5.5 5.5 0 0 0-4.9-8z"/><path d="M9 13h6M9 17h6"/></svg></span></button>
+<div class="llm-panel" id="llmPanel"><div class="llm-header"><span><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2a5.5 5.5 0 0 0-4.9 8H4a2 2 0 0 0-2 2v1a9 9 0 0 0 18 0v-1a2 2 0 0 0-2-2h-.6a5.5 5.5 0 0 0-4.9-8z"/><path d="M9 13h6M9 17h6"/></svg></span> AI 助手</span><div style="display:flex;align-items:center;gap:6px"><select class="llm-psel" id="llmProv" onchange="switchProv()"></select><button onclick="document.getElementById('docFile').click()" title="上传文档"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span></button><button onclick="checkGrammar()" title="数据检查"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></span></button><button onclick="toggleLLM()">&times;</button></div></div><input type="file" id="docFile" accept=".pdf,.docx" style="display:none" onchange="parseDoc(this)"><div class="llm-body" id="llmBody"></div><div class="llm-input"><textarea id="llmIn" placeholder="输入问题..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLLM()}"></textarea><button onclick="sendLLM()">发送</button></div></div>
 <script>// ==================== Data ====================
 var D=loadData();
 function defaultData(){return{set:{fm:"",hl:"",tt:"家谱",wd:"",pr:""},mem:[],ev:[],llm:{provider:"deepseek",keys:{},urls:{},models:{}}}}
@@ -202,7 +208,7 @@ async function pickSaveFile(){
     _fileWritable=true;
     D.set._syncFile=true;
     saveDataRaw();
-    toast('✅ 已关联文件，后续修改自动保存');
+    toast('<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> 已关联文件，后续修改自动保存');
     updateSyncStatus();
   }catch(e){/* cancelled */}
 }
@@ -236,8 +242,8 @@ async function restoreFileHandle(){
 function updateSyncStatus(){
   var el=document.getElementById('syncBadge');
   if(!el)return;
-  if(_fileWritable)el.textContent='🟢 已同步';
-  else if(D.set._syncFile)el.textContent='🟡 待连接';
+  if(_fileWritable)el.innerHTML='<span class="dot" style="background:#22c55e"></span> 已同步';
+  else if(D.set._syncFile)el.innerHTML='<span class="dot" style="background:#eab308"></span> 待连接';
   else el.textContent='';
 }
 
@@ -256,7 +262,7 @@ function handleImportFile(el){
         D=d;
         saveDataRaw();
         renderTree();closeSidePanel();
-        toast('✅ 已导入 '+D.mem.length+' 人');
+        toast('<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> 已导入 '+D.mem.length+' 人');
       }else toast('格式错误：不是家谱文件');
     }catch(e){toast('解析失败: '+e.message)}
   };
@@ -288,10 +294,10 @@ async function handleImportDoc(el){
 
 function showDocImportModal(text,fileName){
   var parsed=parseGenealogyText(text);
-  var h='<h3>📄 导入文档</h3>';
+  var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> 导入文档</h3>';
   h+='<p style="color:var(--sub);font-size:.82rem;margin-bottom:12px">文件: '+esc(fileName)+' ('+text.length+'字)</p>';
   if(parsed.length){
-    h+='<p style="color:var(--red);font-weight:600;margin-bottom:10px">🔍 识别到 '+parsed.length+' 位成员：</p>';
+    h+='<p style="color:var(--red);font-weight:600;margin-bottom:10px"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></span> 识别到 '+parsed.length+' 位成员：</p>';
     h+='<div style="max-height:300px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius-md);padding:12px;margin-bottom:16px;background:var(--paper-alt)">';
     parsed.forEach(function(p,i){
       h+='<div style="padding:6px 0;'+(i>0?'border-top:1px solid var(--line-light);':'')+'">';
@@ -306,7 +312,7 @@ function showDocImportModal(text,fileName){
     });
     h+='</div>';
     h+='<div class="btn-row" style="justify-content:center">';
-    h+='<button class="btn btn-primary" onclick="importParsedMembers()">✅ 导入这 '+parsed.length+' 人</button>';
+    h+='<button class="btn btn-primary" onclick="importParsedMembers()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> 导入这 '+parsed.length+' 人</button>';
     h+='<button class="btn btn-ghost" onclick="closeModal()">取消</button>';
     h+='</div>';
   }else{
@@ -355,7 +361,7 @@ function importParsedMembers(){
     }
   });
   saveData();renderTree();closeModal();
-  var msg='✅ 已导入 '+newMembers.length+' 人';
+  var msg='<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> 已导入 '+newMembers.length+' 人';
   if(skipCount)msg+='（跳过 '+skipCount+' 条重复）';
   toast(msg);
 }
@@ -437,7 +443,7 @@ function parseGenealogyText(text){
         var dgParts=dgOnly[1].split(/[、，,]/);
         dgParts.forEach(function(p){
           p=cleanName(p.trim());
-          if(p&&p.length>=1&&p.length<=4)daughters.push(p);
+          if(p&&p.length>=1)daughters.push(p);
         });
       }
     }
@@ -480,8 +486,6 @@ function parseGenealogyText(text){
       if(!existing.spName&&m.spName)existing.spName=m.spName;
       if(!existing.fa&&m.fa)existing.fa=m.fa;
       if(!existing.mo&&m.mo)existing.mo=m.mo;
-      // Keep children references from both
-      if(m.ch&&m.ch.length)m.ch.forEach(function(cid){if(existing.ch.indexOf(cid)<0)existing.ch.push(cid)});
     }
   });
   var result=[];
@@ -520,22 +524,31 @@ function expWord(){
     if(!gMembers.length)continue;
     gMembers.sort(function(a,b){return(a.od||99)-(b.od||99)});
     body+='<div class="gen-title">第'+genN(g)+'世 ('+gMembers.length+'人)</div>';
-    gMembers.forEach(function(male){
-      var sp=getSp(male),ch=getCh(male);
+    gMembers.forEach(function(m2){
+      var sp=getSp(m2),ch=getCh(m2);
       var sons=[],dgs=[];ch.forEach(function(c){if(c.g==='male')sons.push(c);else dgs.push(c)});
       var t='';
-      if(g===1)t+='讳'+male.name+'，';
-      else{var o='';if(male.od===1)o='长房';else if(male.od===2)o='次房';t+=(o?o+' ':'')+male.name+'，'}
-      t+=male.cy?'字'+male.cy+'。':'。';
-      if(male.bi)t+='生于公元'+male.bi+'年';
-      if(male.de){t+='，卋于'+male.de+'年';var a=parseInt(male.de)-parseInt(male.bi);if(a>0)t+='，享年'+a+'岁'}
-      t+='。';
-      if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
-      if(sons.length){t+='子'+nCN(sons.length)+'：';sons.forEach(function(s,i){if(i>0)t+='，';t+=(i===0?'长':'次')+s.name});t+='。'}
-      if(dgs.length){t+='女'+nCN(dgs.length)+'：';dgs.forEach(function(d,i){if(i>0)t+='，';t+=d.name});t+='。'}
-      if(male.bu)t+='葭于'+male.bu+'。';
-      body+='<div class="member"><div class="name">'+esc(male.name)+'</div><div class="detail">'+t+'</div>';
-      if(male.nt)body+='<div class="note">【按】'+esc(male.nt)+'</div>';
+      if(m2.g==='female'){
+        t+=m2.name+'，';
+        if(m2.cy)t+='字'+m2.cy+'。';
+        if(m2.bi)t+='生于公元'+m2.bi+'年';
+        if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
+        t+='。';
+        if(sp){t+='适'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。';}
+      }else{
+        if(g===1)t+='讳'+m2.name+'，';
+        else{var o='';if(m2.od===1)o='长房';else if(m2.od===2)o='次房';t+=(o?o+' ':'')+m2.name+'，'}
+        t+=m2.cy?'字'+m2.cy+'。':'。';
+        if(m2.bi)t+='生于公元'+m2.bi+'年';
+        if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
+        t+='。';
+        if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+        if(sons.length){t+='子'+nCN(sons.length)+'：';sons.forEach(function(s,i){if(i>0)t+='，';t+=(i===0?'长':'次')+s.name});t+='。'}
+        if(dgs.length){t+='女'+nCN(dgs.length)+'：';dgs.forEach(function(d,i){if(i>0)t+='，';t+=d.name});t+='。'}
+        if(m2.bu)t+='葭于'+m2.bu+'。';
+      }
+      body+='<div class="member"><div class="name">'+esc(m2.name)+'</div><div class="detail">'+t+'</div>';
+      if(m2.nt)body+='<div class="note">【按】'+esc(m2.nt)+'</div>';
       body+='</div>';
     });
   }
@@ -559,11 +572,11 @@ function toggleLLM(){var p=document.getElementById('llmPanel');var f=document.ge
 async function callLLM(messages){
   var prov=getProv();
   var key=getKey(prov);
-  if(!key){addMsg('ai','⚠️ 请先在「⚙️ 设置→AI 助手设置」中配置 '+PROVS[prov].name+' 的 API Key');return null}
+  if(!key){addMsg('ai','<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> 请先在「<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> 设置→AI 助手设置」中配置 '+PROVS[prov].name+' 的 API Key');return null}
   var url=getUrl(prov);
-  if(!url){addMsg('ai','⚠️ 当前模型未配置 API 地址，请在设置中填写 URL');return null}
+  if(!url){addMsg('ai','<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> 当前模型未配置 API 地址，请在设置中填写 URL');return null}
   var mdl=getMdl(prov);
-  var loadingMsg=addMsg('ai','⏳ 正在请求 '+PROVS[prov].name+'...');
+  var loadingMsg=addMsg('ai','<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 3h14M5 21h14M7 3v3c0 2.8 2.2 5 5 5s5-2.2 5-5V3M7 21v-3c0-2.8 2.2-5 5-5s5 2.2 5 5v3"/></svg></span> 正在请求 '+PROVS[prov].name+'...');
   try{
     var headers={'Content-Type':'application/json'};
     var body;
@@ -583,21 +596,21 @@ async function callLLM(messages){
     if(!r.ok){
       var errText='';
       try{var ed=await r.json();errText=ed.error?ed.error.message||JSON.stringify(ed.error):JSON.stringify(ed)}catch(e2){errText=await r.text().catch(function(){return r.status+' '+r.statusText})}
-      updateMsg(loadingMsg,'❌ API 返回 '+r.status+': '+errText);return null
+      updateMsg(loadingMsg,'<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span> API 返回 '+r.status+': '+errText);return null
     }
     var d=await r.json();
-    if(d.error){updateMsg(loadingMsg,'❌ API 错误: '+(d.error.message||JSON.stringify(d.error)));return null}
+    if(d.error){updateMsg(loadingMsg,'<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span> API 错误: '+(d.error.message||JSON.stringify(d.error)));return null}
     var ans=null;
     if(PROVS[prov].isClaude){ans=d.content&&d.content[0]?d.content[0].text:null}
     else if(d.result){ans=d.result}
     else if(d.choices&&d.choices[0]){ans=d.choices[0].message?d.choices[0].message.content:d.choices[0].text}
     else if(d.data&&d.data.choices&&d.data.choices[0]){ans=d.data.choices[0].message?d.data.choices[0].message.content:d.data.choices[0].text}
-    if(!ans){updateMsg(loadingMsg,'⚠️ 未能解析 API 响应: '+JSON.stringify(d).substring(0,200));return null}
+    if(!ans){updateMsg(loadingMsg,'<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> 未能解析 API 响应: '+JSON.stringify(d).substring(0,200));return null}
     loadingMsg.remove();
     return ans;
   }catch(e){
-    if(e.message==='Failed to fetch'){updateMsg(loadingMsg,'❌ 网络请求失败。可能原因：\n1. API 地址错误\n2. 网络不通\n3. 浏览器 CORS 限制（建议用本地 HTTP 服务器打开页面，而不是 file://）')}
-    else{updateMsg(loadingMsg,'❌ 请求失败: '+e.message)}
+    if(e.message==='Failed to fetch'){updateMsg(loadingMsg,'<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span> 网络请求失败。可能原因：\n1. API 地址错误\n2. 网络不通\n3. 浏览器 CORS 限制（建议用本地 HTTP 服务器打开页面，而不是 file://）')}
+    else{updateMsg(loadingMsg,'<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></span> 请求失败: '+e.message)}
     return null
   }
 }
@@ -625,7 +638,7 @@ function switchProv(){var p=document.getElementById('llmProv').value;if(!D.llm)D
 // ==================== Helpers ====================
 var selectedId=null;
 function genN(g){var n=['','一','二','三','四','五','六','七','八','九','十'];if(g<=10)return n[g];if(g<20)return '十'+n[g-10];if(g===20)return '二十';var t=Math.floor(g/10),u=g%10;var tn=['','','二十','三十','四十','五十','六十','七十','八十','九十'];return(tn[t]||t+'十')+(u?n[u]:'')}
-function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500)}
+function toast(m){var e=document.getElementById('toast');e.innerHTML=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},2500)}
 function nId(){if(!D.mem.length)return'G001';var mx=0;D.mem.forEach(function(m){var n=parseInt(m.id.replace(/\D/g,''))||0;if(n>mx)mx=n});return'G'+String(mx+1).padStart(3,'0')}
 function find(id){for(var i=0;i<D.mem.length;i++){if(D.mem[i].id===id)return D.mem[i]}return null}
 function getSp(m){if(!m.sp||!m.sp[0])return null;return find(m.sp[0])}
@@ -643,7 +656,7 @@ function renderTree(){
   var sub=D.set.fm?(D.set.fm+'氏'):'';sub+=D.set.hl?' · '+D.set.hl+'堂':'';sub+=D.set.wd?' · '+D.set.wd+'郡望':'';
   document.getElementById('printSubtitle').textContent=sub||'世代传承 · 枝繁叶茂';
   if(!D.mem.length){
-    el.innerHTML='<div class="tree-hint"><p>🌳 开始构建你的家谱</p><p style="margin-top:12px">点击下方按钮添加<em>始祖</em></p><p style="margin-top:16px"><button class="btn btn-primary" onclick="addRoot()">➕ 添加始祖</button></p><p style="margin-top:20px;font-size:.8rem;color:var(--sub-light)">也可以用 AI 助手 📄 解析文档自动录入</p></div>';
+    el.innerHTML='<div class="tree-hint"><p><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L4 9v12h16V9l-8-6z"/><path d="M9 21v-6h6v6"/></svg></span> 开始构建你的家谱</p><p style="margin-top:12px">点击下方按钮添加<em>始祖</em></p><p style="margin-top:16px"><button class="btn btn-primary" onclick="addRoot()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> 添加始祖</button></p><p style="margin-top:20px;font-size:.8rem;color:var(--sub-light)">也可以用 AI 助手 <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> 解析文档自动录入</p></div>';
     return;
   }
   var roots=[];
@@ -657,32 +670,36 @@ function renderTree(){
 
 function renderFamily(m){
   var ch=getCh(m),sp=getSp(m);
-  if(!ch.length){
+  var isCollapsed=_collapsed.has(m.id);
+  if(!ch.length||isCollapsed){
     var s='<td class="tree-cell">';
     s+='<div class="couple">';
-    s+=renderNode(m);
+    s+=renderNode(m,ch.length,isCollapsed);
     if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp);
     s+='</div></td>';
     return s;
   }
   var s='<td class="tree-cell">';
   s+='<div class="couple">';
-  s+=renderNode(m);
+  s+=renderNode(m,ch.length,isCollapsed);
   if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp);
   s+='</div>';
-  s+='<div class="tree-connector"><div class="tree-vline"></div></div>';
-  s+='<div class="tree-children"><table class="tree-table"><tr>';
-  ch.forEach(function(c){s+=renderFamily(c)});
-  s+='</tr></table></div>';
+  if(!isCollapsed){
+    s+='<div class="tree-connector"><div class="tree-vline"></div></div>';
+    s+='<div class="tree-children"><table class="tree-table"><tr>';
+    ch.forEach(function(c){s+=renderFamily(c)});
+    s+='</tr></table></div>';
+  }
   s+='</td>';
   return s;
 }
 function handleNodeKey(e,id){if(e.key==='Enter')selectNode(id)}
-function renderNode(m){
+function renderNode(m,hasCh,isCollapsed){
   return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
     +'<div class="node-gen">'+genN(m.gen)+'世</div>'
     +'<div class="name">'+esc(m.name)+'</div>'
     +'<div class="info">'+(m.bi?(m.bi+(m.de?'—'+m.de:'')):(m.de?m.de:''))+'</div>'
+    +(hasCh?'<button class="collapse-toggle" onclick="toggleCollapse(\''+m.id+'\',event)" title="'+(isCollapsed?'展开':'收起')+'">'+(isCollapsed?'+':'−')+'</button>':'')
     +'<button class="quick-add" onclick="event.stopPropagation();quickAddChild(\''+m.id+'\')" title="添加子女">+</button></div>';
 }
 
@@ -737,10 +754,11 @@ function showDetail(m){
   if(m.bu)h+='<tr><td>葭地</td><td>'+esc(m.bu)+'</td></tr>';
   if(m.nt)h+='<tr><td>备注</td><td>'+esc(m.nt)+'</td></tr>';
   h+='</table>';
-  h+='<div class="detail-actions"><button class="btn btn-primary btn-sm" onclick="showEdit(find(\''+m.id+'\'))">✏️ 编辑</button>';
-  h+='<button class="btn btn-ghost btn-sm" onclick="quickAddChild(\''+m.id+'\')">➕ 子女</button>';
-  h+='<button class="btn btn-ghost btn-sm" onclick="addSpouse(\''+m.id+'\')">💑 配偶</button>';
-  h+='<button class="btn btn-danger btn-sm" onclick="delM(\''+m.id+'\')">🗑️</button></div>';
+  h+='<div class="detail-actions"><button class="btn btn-primary btn-sm" onclick="showEdit(find(\''+m.id+'\'))"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span> 编辑</button>';
+  h+='<button class="btn btn-ghost btn-sm" onclick="quickAddChild(\''+m.id+'\')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> 子女</button>';
+  h+='<button class="btn btn-ghost btn-sm" onclick="addSpouse(\''+m.id+'\')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="8" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 6-6s6 2.5 6 6"/><circle cx="17" cy="8" r="2.5"/><path d="M14 20c0-2.5 2-4.5 3-4.5s3 2 3 4.5"/></svg></span> 配偶</button>';
+  h+='<button class="btn btn-ghost btn-sm" onclick="addParent(\''+m.id+'\')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span> 父母</button>';
+  h+='<button class="btn btn-danger btn-sm" onclick="delM(\''+m.id+'\')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span></button></div>';
   el.innerHTML=h;
 }
 
@@ -772,7 +790,7 @@ function showEdit(m){
   h+='<div class="fi"><label>照片URL</label><input id="ed-ph" value="'+esc(m.ph||'')+'"></div>';
   h+='<div class="fi full"><label>备注</label><textarea id="ed-nt" rows="3">'+esc(m.nt||'')+'</textarea></div>';
   h+='</div>';
-  h+='<div class="btn-row"><button class="btn btn-primary" onclick="saveEdit(\''+m.id+'\')">💾 保存</button><button class="btn btn-ghost" onclick="showDetail(find(\''+m.id+'\'))">取消</button></div>';
+  h+='<div class="btn-row"><button class="btn btn-primary" onclick="saveEdit(\''+m.id+'\')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span> 保存</button><button class="btn btn-ghost" onclick="showDetail(find(\''+m.id+'\'))">取消</button></div>';
   el.innerHTML=h;
 }
 function saveEdit(id){
@@ -822,6 +840,25 @@ function addSpouse(id){
   m.sp=[s.id];
   D.mem.push(s);saveData();renderTree();selectNode(m.id);toast('配偶已添加');
 }
+function addParent(id){
+  var m=find(id);
+  if(!m)return;
+  var fa=getPar(m,'m'),mo=getPar(m,'f');
+  var choices=[];
+  if(!fa)choices.push('父亲');
+  if(!mo)choices.push('母亲');
+  if(!choices.length){toast('父母信息已完整');return}
+  var type=prompt('添加 '+choices.join(' 或 ')+'？(1='+choices[0]+(choices[1]?' 2='+choices[1]:'')+':','1');
+  if(!type)return;
+  var isFather=(type==='1'&&choices[0]==='父亲')||(type==='2'&&choices[1]==='父亲');
+  var isMother=(type==='1'&&choices[0]==='母亲')||(type==='2'&&choices[1]==='母亲');
+  if(!isFather&&!isMother)return;
+  var nm=prompt(isFather?'父亲姓名:':'母亲姓名:');
+  if(!nm||!nm.trim())return;
+  var p={id:nId(),name:nm.trim(),cy:'',g:isFather?'male':'female',gen:m.gen-1,bi:'',de:'',bu:'',fa:null,mo:null,sp:[],od:null,ph:'',nt:''};
+  if(isFather)m.fa=p.id;else m.mo=p.id;
+  D.mem.push(p);saveData();renderTree();selectNode(m.id);toast((isFather?'父亲':'母亲')+'已添加');
+}
 var _lastDeleted=null;
 function delM(id){
   if(!confirm('确定删除此人？'))return;
@@ -837,7 +874,7 @@ function delM(id){
 function undoDelete(){
   if(!_lastDeleted){toast('没有可撤销的删除');return}
   D.mem.push(_lastDeleted);saveData();renderTree();
-  toast('✅ 已恢复 '+_lastDeleted.name);_lastDeleted=null;
+  toast('<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> 已恢复 '+_lastDeleted.name);_lastDeleted=null;
 }
 
 function clearAll(){
@@ -883,7 +920,7 @@ function showEvents(m){
   var h='';
   if(!evs.length)h='<p style="color:var(--sub);font-size:.85rem;text-align:center;padding:20px">暂无事件记录</p>';
   else evs.forEach(function(e,idx){h+='<div class="event-item"><div class="event-date">'+esc(e.d)+'</div><div style="flex:1">'+esc(e.e)+'</div><button onclick="delEvent('+idx+',\''+m.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--sub-light);font-size:.8rem" title="删除">×</button></div>'});
-  h+='<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="addEvent(\''+m.id+'\')">➕ 添加事件</button></div>';
+  h+='<div class="btn-row"><button class="btn btn-ghost btn-sm" onclick="addEvent(\''+m.id+'\')"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> 添加事件</button></div>';
   el.innerHTML=h;
 }
 function delEvent(idx,mid){
@@ -908,32 +945,36 @@ function closeModal(){document.getElementById('modalBg').classList.remove('show'
 function showRecordsModal(){
   if(!D.mem.length){toast('暂无数据');return}
   var mx=0;D.mem.forEach(function(m){if(m.gen>mx)mx=m.gen});
-  var h='<h3>📖 齿录</h3>';
+  var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span> 齿录</h3>';
   for(var g=1;g<=mx;g++){
     var ms=[];D.mem.forEach(function(m){if(m.gen===g)ms.push(m)});
     if(!ms.length)continue;
     ms.sort(function(a,b){return(a.od||99)-(b.od||99)});
     h+='<h4 style="color:var(--red);margin:16px 0 8px;border-bottom:2px solid var(--line);padding-bottom:6px;font-family:serif">第'+genN(g)+'世 ('+ms.length+'人)</h4>';
-    ms.forEach(function(male){
-      var sp=getSp(male),ch=getCh(male);
+    ms.forEach(function(m2){
+      var sp=getSp(m2),ch=getCh(m2);
       var sons=[],dgs=[];ch.forEach(function(c){if(c.g==='male')sons.push(c);else dgs.push(c)});
       var t='';
-      if(male.g==='male'){
-        if(g===1)t+='讳'+male.name+'，';
-        else{var o='';if(male.od===1)o='长房';else if(male.od===2)o='次房';t+=(o?o+' ':'')+male.name+'，'}
+      if(m2.g==='male'){
+        if(g===1)t+='讳'+m2.name+'，';
+        else{var o='';if(m2.od===1)o='长房';else if(m2.od===2)o='次房';t+=(o?o+' ':'')+m2.name+'，'}
       }else{
-        t+=male.name+'，';
+        t+=m2.name+'，';
       }
-      t+=male.cy?'字'+male.cy+'。':'。';
-      if(male.bi)t+='生于公元'+male.bi+'年';
-      if(male.de){t+='，卋于'+male.de+'年';var a=parseInt(male.de)-parseInt(male.bi);if(a>0)t+='，享年'+a+'岁'}
+      t+=m2.cy?'字'+m2.cy+'。':'。';
+      if(m2.bi)t+='生于公元'+m2.bi+'年';
+      if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
       t+='。';
-      if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+      if(m2.g==='female'){
+        if(sp){t+='适'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+      }else{
+        if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+      }
       if(sons.length){t+='子'+nCN(sons.length)+'：';sons.forEach(function(s,i){if(i>0)t+='，';t+=(i===0?'长':'次')+s.name});t+='。'}
       if(dgs.length){t+='女'+nCN(dgs.length)+'：';dgs.forEach(function(d,i){if(i>0)t+='，';t+=d.name});t+='。'}
-      if(male.bu)t+='葭于'+male.bu+'。';
-      h+='<div class="record-block"><div class="rec-name">'+esc(male.name)+'</div><div class="rec-text">'+t+'</div>';
-      if(male.nt)h+='<div class="rec-note">【按】'+esc(male.nt)+'</div>';
+      if(m2.bu)t+='葭于'+m2.bu+'。';
+      h+='<div class="record-block"><div class="rec-name">'+esc(m2.name)+'</div><div class="rec-text">'+t+'</div>';
+      if(m2.nt)h+='<div class="rec-note">【按】'+esc(m2.nt)+'</div>';
       h+='</div>';
     });
   }
@@ -942,10 +983,10 @@ function showRecordsModal(){
 }
 
 function showEventsModal(){
-  var h='<h3>📅 大事记</h3>';
+  var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span> 大事记</h3>';
   if(!D.ev||!D.ev.length)h+='<p style="color:var(--sub);text-align:center;padding:20px">暂无大事记</p>';
   else h+=D.ev.map(function(e){var nm='';var m=find(e.mid);if(m)nm=m.name;return'<div class="event-item"><div class="event-date">'+esc(e.d)+'</div><div><b>'+esc(nm)+'</b> '+esc(e.e)+'</div></div>'}).join('');
-  h+='<div class="btn-row" style="justify-content:center;margin-top:16px"><button class="btn btn-ghost btn-sm" onclick="addGlobalEvent()">➕ 添加大事记</button></div>';
+  h+='<div class="btn-row" style="justify-content:center;margin-top:16px"><button class="btn btn-ghost btn-sm" onclick="addGlobalEvent()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> 添加大事记</button></div>';
   document.getElementById('modalBody').innerHTML=h;
   openModal();
 }
@@ -959,19 +1000,19 @@ function addGlobalEvent(){
 }
 
 function showExportModal(){
-  var h='<h3>📤 导出</h3>';
+  var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> 导出</h3>';
   h+='<div style="text-align:center;padding:16px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px">';
-  h+='<button class="btn btn-gold" onclick="expWord()">📝 导出 Word</button>';
-  h+='<button class="btn btn-primary" onclick="window.print()">🖨️ 打印当前视图</button>';
-  h+='<button class="btn btn-ghost" onclick="expJSON()">📥 导出 JSON</button>';
-  h+='<button class="btn btn-ghost" onclick="expCSV()">📊 导出 CSV</button>';
+  h+='<button class="btn btn-gold" onclick="expWord()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span> 导出 Word</button>';
+  h+='<button class="btn btn-primary" onclick="window.print()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span> 打印当前视图</button>';
+  h+='<button class="btn btn-ghost" onclick="expJSON()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> 导出 JSON</button>';
+  h+='<button class="btn btn-ghost" onclick="expCSV()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> 导出 CSV</button>';
   h+='</div>';
-  h+='<h4 style="color:var(--red);margin:20px 0 12px;text-align:center">📋 打印模板</h4>';
+  h+='<h4 style="color:var(--red);margin:20px 0 12px;text-align:center"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span> 打印模板</h4>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">';
-  h+='<div class="tpl-card" onclick="printTemplate(1)"><div class="tpl-icon">🌳</div><div class="tpl-name">竖排世系图</div><div class="tpl-desc">传统树形，A4纵向</div></div>';
-  h+='<div class="tpl-card" onclick="printTemplate(2)"><div class="tpl-icon">📊</div><div class="tpl-name">横排五世一提</div><div class="tpl-desc">欧阳修式，A4横向</div></div>';
-  h+='<div class="tpl-card" onclick="printTemplate(3)"><div class="tpl-icon">📖</div><div class="tpl-name">齿录式</div><div class="tpl-desc">按世代分组，详细记录</div></div>';
-  h+='<div class="tpl-card" onclick="printTemplate(4)"><div class="tpl-icon">🏔️</div><div class="tpl-name">宝塔式</div><div class="tpl-desc">始祖居上，层层展开</div></div>';
+  h+='<div class="tpl-card" onclick="printTemplate(1)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3L4 9v12h16V9l-8-6z"/><path d="M9 21v-6h6v6"/></svg></span></div><div class="tpl-name">竖排世系图</div><div class="tpl-desc">传统树形，A4纵向</div></div>';
+  h+='<div class="tpl-card" onclick="printTemplate(2)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span></div><div class="tpl-name">横排五世一提</div><div class="tpl-desc">欧阳修式，A4横向</div></div>';
+  h+='<div class="tpl-card" onclick="printTemplate(3)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span></div><div class="tpl-name">齿录式</div><div class="tpl-desc">按世代分组，详细记录</div></div>';
+  h+='<div class="tpl-card" onclick="printTemplate(4)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2z"/></svg></span></div><div class="tpl-name">宝塔式</div><div class="tpl-desc">始祖居上，层层展开</div></div>';
   h+='</div>';
   document.getElementById('modalBody').innerHTML=h;
   openModal();
@@ -984,7 +1025,7 @@ function showStatsModal(){
   D.mem.forEach(function(m){if(m.g==='male')males++;else females++});
   var roots=[];D.mem.forEach(function(m){if(!m.fa&&!m.mo)roots.push(m)});
   var orphans=0;D.mem.forEach(function(m){if(m.fa&&!find(m.fa)&&m.mo&&!find(m.mo))orphans++});
-  var h='<h3>📊 数据统计</h3>';
+  var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> 数据统计</h3>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">';
   h+='<div style="padding:16px;background:var(--paper-alt);border-radius:var(--radius-md);text-align:center"><div style="font-size:2rem;font-weight:700;color:var(--red)">'+D.mem.length+'</div><div style="font-size:.8rem;color:var(--sub)">总人数</div></div>';
   h+='<div style="padding:16px;background:var(--paper-alt);border-radius:var(--radius-md);text-align:center"><div style="font-size:2rem;font-weight:700;color:var(--gold)">'+mx+'</div><div style="font-size:.8rem;color:var(--sub)">总世代</div></div>';
@@ -1010,7 +1051,7 @@ function showStatsModal(){
     h+='<h4 style="color:var(--red);margin-bottom:10px">始祖</h4>';
     h+='<p style="font-size:.85rem;color:var(--sub);margin-bottom:12px">'+roots.map(function(r){return esc(r.name)}).join('、')+'</p>';
   }
-  if(orphans)h+='<p style="font-size:.82rem;color:var(--red-light);margin-top:8px">⚠️ '+orphans+' 人的父母引用已失效</p>';
+  if(orphans)h+='<p style="font-size:.82rem;color:var(--red-light);margin-top:8px"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> '+orphans+' 人的父母引用已失效</p>';
   document.getElementById('modalBody').innerHTML=h;
   openModal();
 }
@@ -1027,7 +1068,7 @@ function addMsg(role,text){
 function updateMsg(el,text){if(el)el.textContent=text}
 
 function showSettingsModal(){
-  var h='<h3>⚙️ 设置</h3>';
+  var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> 设置</h3>';
   h+='<div class="s-section"><h4>家谱信息</h4>';
   h+='<div class="s-row"><label>标题</label><input id="set-tt" value="'+esc(D.set.tt||'')+'"></div>';
   h+='<div class="s-row"><label>姓氏</label><input id="set-fm" value="'+esc(D.set.fm||'')+'"></div>';
@@ -1046,9 +1087,9 @@ function showSettingsModal(){
   h+='<div class="s-section"><h4>数据管理</h4>';
   h+='<p style="font-size:.82rem;color:var(--sub);margin-bottom:10px">当前 '+D.mem.length+' 条记录</p>';
   h+='<div class="btn-row">';
-  h+='<button class="btn btn-danger" onclick="clearAll()">🗑️ 清空所有数据</button>';
+  h+='<button class="btn btn-danger" onclick="clearAll()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span> 清空所有数据</button>';
   h+='</div></div>';
-  h+='<div class="btn-row"><button class="btn btn-primary" onclick="saveSettings()">💾 保存</button></div>';
+  h+='<div class="btn-row"><button class="btn btn-primary" onclick="saveSettings()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></span> 保存</button></div>';
   document.getElementById('modalBody').innerHTML=h;
   openModal();
 }
@@ -1118,7 +1159,7 @@ async function parseDoc(el){
       D.mem.push(m);ad++
     });
     saveData();renderTree();
-    addMsg('ai','✅ 录入 '+ad+' 人！');
+    addMsg('ai','<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> 录入 '+ad+' 人！');
   }catch(e){addMsg('ai','解析失败: '+e.message)}
 }
 
@@ -1152,35 +1193,37 @@ async function checkGrammar(){
   var names={};
   D.mem.forEach(function(m){
     // Duplicate names
-    if(names[m.name])issues.push('⚠️ 重名: '+m.name+' (出现'+(names[m.name]+1)+'次)');
+    if(names[m.name])issues.push('<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> 重名: '+m.name+' (出现'+(names[m.name]+1)+'次)');
     names[m.name]=(names[m.name]||0)+1;
     // Orphan references
-    if(m.fa&&!find(m.fa))issues.push('⚠️ '+m.name+' 的父亲引用已失效');
-    if(m.mo&&!find(m.mo))issues.push('⚠️ '+m.name+' 的母亲引用已失效');
+    if(m.fa&&!find(m.fa))issues.push('<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> '+m.name+' 的父亲引用已失效');
+    if(m.mo&&!find(m.mo))issues.push('<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> '+m.name+' 的母亲引用已失效');
     // Self reference
-    if(m.fa===m.id)issues.push('🔴 '+m.name+' 的父亲是自己');
-    if(m.mo===m.id)issues.push('🔴 '+m.name+' 的母亲是自己');
+    if(m.fa===m.id)issues.push('<span class="dot" style="background:#ef4444"></span> '+m.name+' 的父亲是自己');
+    if(m.mo===m.id)issues.push('<span class="dot" style="background:#ef4444"></span> '+m.name+' 的母亲是自己');
     // Circular spouse
-    if(m.sp&&m.sp[0]===m.id)issues.push('🔴 '+m.name+' 的配偶是自己');
+    if(m.sp&&m.sp[0]===m.id)issues.push('<span class="dot" style="background:#ef4444"></span> '+m.name+' 的配偶是自己');
     // Generation mismatch
-    if(m.fa){var fa=find(m.fa);if(fa&&fa.gen>=m.gen)issues.push('⚠️ '+m.name+'(第'+m.gen+'世)的辈分不高于父亲'+fa.name+'(第'+fa.gen+'世)');}
+    if(m.fa){var fa=find(m.fa);if(fa&&fa.gen>=m.gen)issues.push('<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> '+m.name+'(第'+m.gen+'世)的辈分不高于父亲'+fa.name+'(第'+fa.gen+'世)');}
     // Missing name
-    if(!m.name||m.name.length<1)issues.push('🔴 缺少姓名的记录 (ID:'+m.id+')');
+    if(!m.name||m.name.length<1)issues.push('<span class="dot" style="background:#ef4444"></span> 缺少姓名的记录 (ID:'+m.id+')');
   });
   if(issues.length){
-    addMsg('ai','🔍 本地检查发现 '+issues.length+' 个问题：\n\n'+issues.join('\n'));
+    addMsg('ai','<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></span> 本地检查发现 '+issues.length+' 个问题：\n\n'+issues.join('\n'));
   }else{
-    addMsg('ai','✅ 本地检查通过，未发现问题');
+    addMsg('ai','<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span> 本地检查通过，未发现问题');
   }
   // Then AI check
   var text=D.mem.map(function(m){return m.name+',第'+genN(m.gen)+'世,'+(m.bi||'?')+'—'+(m.de||'?')}).join('\n');
   var msgs=[{role:'system',content:'检查家谱数据问题: 错别字、年份逻辑、辈分错误。简洁列出问题。'},{role:'user',content:text}];
   var ans=await callLLM(msgs);
-  if(ans)addMsg('ai','\n🤖 AI 分析：\n'+ans);
+  if(ans)addMsg('ai','\n<span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></span> AI 分析：\n'+ans);
 }
 
 // ==================== Mobile Zoom/Pan ====================
 var _zoom=1,_panX=0,_panY=0,_lastTouch=null,_pinchStart=null;
+var _collapsed=new Set(); // IDs of collapsed nodes
+function toggleCollapse(id,e){e.stopPropagation();if(_collapsed.has(id))_collapsed.delete(id);else _collapsed.add(id);renderTree()}
 
 function toggleMenu(){
   var acts=document.querySelector('.actions');
@@ -1215,6 +1258,22 @@ function resetZoom(){
   var c=document.getElementById('treeContainer');
   if(c)c.style.transform='';
 }
+
+function fitWidth(){
+  var panel=document.getElementById('treePanel');
+  var container=document.getElementById('treeContainer');
+  if(!panel||!container)return;
+  var panelW=panel.clientWidth-40;
+  var treeW=container.scrollWidth;
+  if(treeW<=panelW){_zoom=1;_panX=0;_panY=0;applyTransform();return}
+  _zoom=Math.max(0.15,panelW/treeW);
+  _panX=0;_panY=0;
+  applyTransform();
+  toast('缩放至 '+Math.round(_zoom*100)+'%');
+}
+
+function expandAll(){_collapsed.clear();renderTree()}
+function collapseAll(){D.mem.forEach(function(m){if(getCh(m).length)_collapsed.add(m.id)});renderTree()}
 
 function initTouchZoom(){
   var panel=document.getElementById('treePanel');
@@ -1524,7 +1583,7 @@ function doSearch(q){
     if(m.name.toLowerCase().indexOf(q)>=0||(m.cy&&m.cy.toLowerCase().indexOf(q)>=0)||(m.nt&&m.nt.toLowerCase().indexOf(q)>=0))results.push(m);
   });
   var el=document.getElementById('treeContainer');
-  if(!results.length){el.innerHTML='<div class="tree-hint"><p>🔍 未找到</p><p style="margin-top:12px">没有找到包含「'+esc(q)+'」的成员</p></div>';return}
+  if(!results.length){el.innerHTML='<div class="tree-hint"><p><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg></span> 未找到</p><p style="margin-top:12px">没有找到包含「'+esc(q)+'」的成员</p></div>';return}
   var h='<div style="margin-bottom:16px;padding:12px 16px;background:var(--paper-alt);border-radius:var(--radius-md);border:1px solid var(--border)"><b>搜索结果：</b>找到 '+results.length+' 人</div>';
   results.forEach(function(m){
     h+='<div class="record-block" style="cursor:pointer" onclick="selectNode(\''+m.id+'\')">';
