@@ -29,6 +29,10 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .tree-branch{display:flex;flex-direction:column;align-items:center;position:relative}
 .tree-node-wrap{position:relative;z-index:1}
 .tree-node-wrap .couple{display:flex;align-items:center;gap:0}
+.drag-line{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999}
+.drag-line line{stroke:var(--red);stroke-width:2;stroke-dasharray:6 4}
+.node.dragging{outline:2px dashed var(--red);outline-offset:2px;opacity:.7}
+.node.drag-over{outline:2px solid var(--gold);outline-offset:2px;background:var(--gold-faint)}
 .tree-children{display:flex;justify-content:center;gap:20px;margin-top:30px;position:relative}
 .tree-branch.has-children>.tree-node-wrap::after{content:"";position:absolute;bottom:-38px;left:50%;width:2px;height:38px;background:var(--tree-line);transform:translateX(-50%)}
 .tree-children>.tree-branch::before{content:"";position:absolute;top:-30px;left:50%;width:2px;height:30px;background:var(--tree-line);transform:translateX(-50%)}
@@ -1284,15 +1288,17 @@ function expandAll(){_collapsed.clear();renderTree()}
 function collapseAll(){D.mem.forEach(function(m){if(getCh(m).length)_collapsed.add(m.id)});renderTree()}
 
 // ==================== Drag & Drop ====================
-var _dragFrom=null,_dragLine=null;
+var _dragFrom=null,_dragLine=null,_dragMoved=false;
 function initDrag(){
   document.addEventListener("mousedown",function(e){
     var node=e.target.closest(".node");
     if(!node||e.target.closest(".quick-add")||e.target.closest(".collapse-toggle"))return;
     var id=node.dataset.id;if(!id)return;
-    _dragFrom=id;node.classList.add("dragging");
+    _dragFrom=id;_dragMoved=false;node.classList.add("dragging");
     _dragLine=document.createElementNS("http://www.w3.org/2000/svg","svg");
     _dragLine.classList.add("drag-line");
+    _dragLine.setAttribute("width",window.innerWidth);
+    _dragLine.setAttribute("height",window.innerHeight);
     var r=node.getBoundingClientRect();
     _dragLine.innerHTML="<line x1=\""+(r.left+r.width/2)+"\" y1=\""+(r.top+r.height/2)+"\" x2=\""+e.clientX+"\" y2=\""+e.clientY+"\"/>";
     document.body.appendChild(_dragLine);
@@ -1300,6 +1306,7 @@ function initDrag(){
   });
   document.addEventListener("mousemove",function(e){
     if(!_dragFrom||!_dragLine)return;
+    _dragMoved=true;
     var ln=_dragLine.querySelector("line");
     var n=document.querySelector(".node[data-id=\""+_dragFrom+"\"]");
     if(n&&ln){var r=n.getBoundingClientRect();ln.setAttribute("x1",r.left+r.width/2);ln.setAttribute("y1",r.top+r.height/2);ln.setAttribute("x2",e.clientX);ln.setAttribute("y2",e.clientY)}
@@ -1316,6 +1323,9 @@ function initDrag(){
     if(tgt){var tn=tgt.closest(".node");if(tn&&tn.dataset.id&&tn.dataset.id!==_dragFrom)showRelPicker(_dragFrom,tn.dataset.id)}
     _dragFrom=null;
   });
+  document.addEventListener("click",function(e){
+    if(_dragMoved){e.stopPropagation();e.preventDefault();_dragMoved=false}
+  },true);
 }
 initDrag();
 function showRelPicker(fromId,toId){
