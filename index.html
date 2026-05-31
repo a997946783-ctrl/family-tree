@@ -55,6 +55,10 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .node .quick-add:hover{transform:translateX(-50%) scale(1.15)}
 .collapse-toggle{position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--gold);color:#fff;border:2px solid var(--paper);font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;box-shadow:0 1px 4px rgba(139,105,20,.3);line-height:1;padding:0;transition:all .2s}
 .collapse-toggle:hover{background:var(--gold-light);transform:scale(1.15)}
+.node-del{position:absolute;top:-8px;left:-8px;width:18px;height:18px;border-radius:50%;background:var(--red-light);color:#fff;border:2px solid var(--paper);cursor:pointer;display:none;align-items:center;justify-content:center;z-index:3;box-shadow:0 1px 4px rgba(183,80,80,.3);line-height:1;padding:2px;transition:all .2s}
+.node-del svg{width:12px;height:12px}
+.node:hover .node-del{display:flex}
+.node-del:hover{background:#c0392b;transform:scale(1.15)}
 .spouse-line{width:24px;height:2.5px;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;opacity:.7}
 
 
@@ -703,6 +707,7 @@ function renderNode(m,hasCh,isCollapsed,familyId){
   var dragId=familyId||m.id;
   var tf=(m.ox||m.oy)?' style="transform:translate('+(m.ox||0)+'px,'+(m.oy||0)+'px)"':'';
   return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" data-id="'+dragId+'"'+tf+' tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
+    +'<button class="node-del" onclick="event.stopPropagation();delM(\''+m.id+'\')" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
     +'<div class="node-gen">'+genN(m.gen)+'世</div>'
     +'<div class="name">'+esc(m.name)+'</div>'
     +'<div class="info">'+(m.bi?(m.bi+(m.de?'—'+m.de:'')):(m.de?m.de:''))+'</div>'
@@ -1297,7 +1302,7 @@ var _posDrag=null,_posDragging=false; // position drag state
 function initDrag(){
   document.addEventListener("mousedown",function(e){
     var node=e.target.closest(".node");
-    if(!node||e.target.closest(".quick-add")||e.target.closest(".collapse-toggle"))return;
+    if(!node||e.target.closest(".quick-add")||e.target.closest(".collapse-toggle")||e.target.closest(".node-del"))return;
     var id=node.dataset.id;if(!id)return;
     if(e.shiftKey){
       var m=find(id);if(!m)return;
