@@ -553,7 +553,7 @@ function expWord(){
       }else{
         if(g===1)t+='讳'+m2.name+'，';
         else{var o='';if(m2.od===1)o='长房';else if(m2.od===2)o='次房';t+=(o?o+' ':'')+m2.name+'，'}
-        t+=m2.cy?'字'+m2.cy+'。':'。';
+        if(m2.cy)t+='字'+m2.cy+'。';
         if(m2.bi)t+='生于公元'+m2.bi+'年';
         if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
         t+='。';
@@ -580,6 +580,41 @@ function expCSV(){
     h+=['"'+m.id+'"','"'+m.name+'"','"'+(m.cy||'')+'"','"'+(m.g==='male'?'男':'女')+'"','"'+m.gen+'"','"'+(m.bi||'')+'"','"'+(m.de||'')+'"','"'+(m.bu||'')+'"','"'+(m.fa||'')+'"','"'+(m.mo||'')+'"','"'+(m.sp&&m.sp[0]||'')+'"','"'+(m.od||'')+'"','"'+(m.nt||'')+'"'].join(',')+'\n';
   });
   var b=new Blob(['\ufeff'+h],{type:'text/csv;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='家谱_'+new Date().toISOString().slice(0,10)+'.csv';a.click();toast('已导出CSV')
+}
+
+function expWordTable(){
+  if(!D.mem.length){toast('暂无数据');return}
+  var tt=D.set.tt||'家谱';
+  var sub=D.set.fm?(D.set.fm+'氏'):'';sub+=D.set.hl?' · '+D.set.hl+'堂':'';
+  var css='@page{size:A4 landscape;margin:1.5cm}body{font-family:"SimSun","Noto Serif SC",serif;color:#1a1714;line-height:1.6;font-size:10pt}'+
+    '.title{text-align:center;font-size:20pt;font-weight:700;letter-spacing:.3em;margin-bottom:4px}'+
+    '.subtitle{text-align:center;font-size:10pt;color:#666;margin-bottom:16px}'+
+    'table{width:100%;border-collapse:collapse;font-size:9pt}'+
+    'th{background:#7a1e1e;color:#fff;padding:6px 8px;text-align:center;font-weight:600;border:1px solid #5c1515}'+
+    'td{padding:5px 8px;border:1px solid #ddd7cc;text-align:center}'+
+    'tr:nth-child(even){background:#faf8f4}'+
+    '.gen-row{background:#f5f0e8!important;font-weight:700;color:#7a1e1e;text-align:left}'+
+    'a{color:#7a1e1e;text-decoration:none}';
+  var mx=0;D.mem.forEach(function(m){if(m.gen>mx)mx=m.gen});
+  var body='<div class="title">'+esc(tt)+'族谱 · 世系总表</div>';
+  if(sub)body+='<div class="subtitle">'+esc(sub)+'</div>';
+  body+='<table><tr><th>世代</th><th>编号</th><th>姓名</th><th>字</th><th>性别</th><th>生年</th><th>卒年</th><th>父亲</th><th>母亲</th><th>配偶</th><th>排行</th><th>葭地</th><th>备注</th></tr>';
+  for(var g=1;g<=mx;g++){
+    var ms=[];D.mem.forEach(function(m){if(m.gen===g)ms.push(m)});
+    if(!ms.length)continue;
+    ms.sort(function(a,b){return(a.od||99)-(b.od||99)});
+    body+='<tr class="gen-row"><td colspan="13">第'+genN(g)+'世 （'+ms.length+'人）</td></tr>';
+    ms.forEach(function(m){
+      var fa=m.fa?find(m.fa):null;var mo=m.mo?find(m.mo):null;var sp=getSp(m);
+      body+='<tr><td>'+genN(g)+'世</td><td>'+m.id+'</td><td>'+esc(m.name)+'</td><td>'+(m.cy?esc(m.cy):'')+'</td><td>'+(m.g==='male'?'男':'女')+'</td><td>'+(m.bi||'')+'</td><td>'+(m.de||'')+'</td><td>'+(fa?esc(fa.name):'')+'</td><td>'+(mo?esc(mo.name):'')+'</td><td>'+(sp?esc(sp.name):'')+'</td><td>'+(m.od!=null?['','长','次','三','四','五','六','七','八','九','十'][m.od]||m.od:'')+'</td><td>'+(m.bu||'')+'</td><td>'+(m.nt||'')+'</td></tr>';
+    });
+  }
+  body+='</table>';
+  var html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><style>'+css+'</style></head><body>'+body+'</body></html>';
+  var b=new Blob(['\ufeff'+html],{type:'application/msword'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(b);
+  a.download=tt+'族谱_世系表_'+new Date().toISOString().slice(0,10)+'.doc';
+  a.click();toast('已导出世系表');
 }
 
 function toggleLLM(){var p=document.getElementById('llmPanel');var f=document.getElementById('llmFab');if(p.classList.contains('show')){p.classList.remove('show');f.classList.remove('hide')}else{p.classList.add('show');f.classList.add('hide');initProvUI()}}
@@ -931,7 +966,7 @@ function showRecord(m){
     if(m.gen===1)t+='讳'+m.name+'，';
     else{var o='';if(m.od===1)o='长房';else if(m.od===2)o='次房';t+=(o?o+' ':'')+m.name+'，'}
   }
-  t+=m.cy?'字'+m.cy+'。':'。';
+  if(m.cy)t+='字'+m.cy+'。';
   if(m.bi)t+='生于公元'+m.bi+'年';
   if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
   t+='。';
@@ -1001,7 +1036,7 @@ function showRecordsModal(){
       }else{
         t+=m2.name+'，';
       }
-      t+=m2.cy?'字'+m2.cy+'。':'。';
+      if(m2.cy)t+='字'+m2.cy+'。';
       if(m2.bi)t+='生于公元'+m2.bi+'年';
       if(m2.de){t+='，卋于'+m2.de+'年';var a=parseInt(m2.de)-parseInt(m2.bi);if(a>0)t+='，享年'+a+'岁'}
       t+='。';
@@ -1042,7 +1077,8 @@ function addGlobalEvent(){
 function showExportModal(){
   var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span> 导出</h3>';
   h+='<div style="text-align:center;padding:16px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px">';
-  h+='<button class="btn btn-gold" onclick="expWord()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span> 导出 Word</button>';
+  h+='<button class="btn btn-gold" onclick="expWord()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span> 齿录式 Word</button>';
+  h+='<button class="btn btn-gold" onclick="expWordTable()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="3" x2="9" y2="21"/></svg></span> 世系表 Word</button>';
   h+='<button class="btn btn-primary" onclick="window.print()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span> 打印当前视图</button>';
   h+='<button class="btn btn-ghost" onclick="expJSON()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span> 导出 JSON</button>';
   h+='<button class="btn btn-ghost" onclick="expCSV()"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span> 导出 CSV</button>';
@@ -1053,6 +1089,8 @@ function showExportModal(){
   h+='<div class="tpl-card" onclick="printTemplate(2)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span></div><div class="tpl-name">横排五世一提</div><div class="tpl-desc">欧阳修式，A4横向</div></div>';
   h+='<div class="tpl-card" onclick="printTemplate(3)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span></div><div class="tpl-name">齿录式</div><div class="tpl-desc">按世代分组，详细记录</div></div>';
   h+='<div class="tpl-card" onclick="printTemplate(4)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3l4 8 5-5 5 15H2z"/></svg></span></div><div class="tpl-name">宝塔式</div><div class="tpl-desc">始祖居上，层层展开</div></div>';
+  h+='<div class="tpl-card" onclick="printTemplate(5)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></span></div><div class="tpl-name">世系总表</div><div class="tpl-desc">表格一览，A4纵向</div></div>';
+  h+='<div class="tpl-card" onclick="printTemplate(6)"><div class="tpl-icon"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M4 12h16M12 4v16"/></svg></span></div><div class="tpl-name">苏洵式</div><div class="tpl-desc">横排五世一提，层次分明</div></div>';
   h+='</div>';
   document.getElementById('modalBody').innerHTML=h;
   openModal();
@@ -1602,6 +1640,8 @@ function printTemplate(type){
   else if(type===2) body=tplFiveGen(css,tt,sub);
   else if(type===3) body=tplRecord(css,tt,sub);
   else if(type===4) body=tplPyramid(css,tt,sub);
+  else if(type===5) body=tplGenTable(css,tt,sub);
+  else if(type===6) body=tplSuXun(css,tt,sub);
   
   var w=window.open('','_blank');
   w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+tt+'</title><style>'+css+'</style></head><body>'+body+'</body></html>');
@@ -1736,7 +1776,7 @@ function tplRecord(css,tt,sub){
         if(g===1)t+='讳'+m.name+'，';
         else{var o='';if(m.od===1)o='长房';else if(m.od===2)o='次房';t+=(o?o+' ':'')+m.name+'，'}
       }else{t+=m.name+'，'}
-      t+=m.cy?'字'+m.cy+'。':'。';
+      if(m.cy)t+='字'+m.cy+'。';
       if(m.bi)t+='生于公元'+m.bi+'年';
       if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
       t+='。';
@@ -1776,6 +1816,57 @@ function tplPyramid(css,tt,sub){
     h+='</div>';
   }
   h+='</div>';
+  return h;
+}
+
+function tplGenTable(css,tt,sub){
+  var h='<div class="title">'+esc(tt)+'</div>';
+  if(sub)h+='<div class="subtitle">'+esc(sub)+'</div>';
+  h+='<p style="text-align:center;color:#666;font-size:10pt;margin-bottom:16px">世系总表 · 一览全局</p>';
+  function find(id){return D.mem.find(function(m){return m.id===id})}
+  function getSp(m){if(!m.sp||!m.sp.length)return null;return find(m.sp[0])}
+  var mx=0;D.mem.forEach(function(m){if(m.gen>mx)mx=m.gen});
+  h+='<table style="width:100%;font-size:10pt"><tr><th>世代</th><th>姓名</th><th>字</th><th>性别</th><th>生年</th><th>卒年</th><th>配偶</th><th>子女数</th><th>葭地</th></tr>';
+  for(var g=1;g<=mx;g++){
+    var ms=[];D.mem.forEach(function(m){if(m.gen===g)ms.push(m)});
+    if(!ms.length)continue;
+    ms.sort(function(a,b){return(a.od||99)-(b.od||99)});
+    ms.forEach(function(m){
+      var sp=getSp(m);var ch=D.mem.filter(function(c){return c.fa===m.id||c.mo===m.id});
+      h+='<tr><td>'+genN(g)+'世</td><td>'+esc(m.name)+'</td><td>'+(m.cy?esc(m.cy):'')+'</td><td>'+(m.g==='male'?'男':'女')+'</td><td>'+(m.bi||'')+'</td><td>'+(m.de||'')+'</td><td>'+(sp?esc(sp.name):'')+'</td><td>'+(ch.length||'')+'</td><td>'+(m.bu||'')+'</td></tr>';
+    });
+  }
+  h+='</table>';
+  return h;
+}
+
+function tplSuXun(css,tt,sub){
+  var h='<div class="title">'+esc(tt)+'</div>';
+  if(sub)h+='<div class="subtitle">'+esc(sub)+'</div>';
+  h+='<p style="text-align:center;color:#666;font-size:10pt;margin-bottom:16px">苏洵式 · 五世一提横排</p>';
+  function find(id){return D.mem.find(function(m){return m.id===id})}
+  function getSp(m){if(!m.sp||!m.sp.length)return null;return find(m.sp[0])}
+  function getCh(m){return D.mem.filter(function(c){return c.fa===m.id||c.mo===m.id}).sort(function(a,b){return(a.od||99)-(b.od||99)})}
+  var mx=0;D.mem.forEach(function(m){if(m.gen>mx)mx=m.gen});
+  var roots=[];D.mem.forEach(function(m){if(!m.fa&&!m.mo)roots.push(m)});
+  function renderBlock(root,depth){
+    if(depth>6)return'';
+    var s='<div style="display:flex;align-items:flex-start;margin:8px 0">';
+    s+='<div style="min-width:80px;padding:6px 10px;border:1px solid #999;border-radius:4px;text-align:center;background:#faf8f4">';
+    s+='<b>'+esc(root.name)+'</b>';
+    var sp=getSp(root);
+    if(sp)s+='<br><span style="font-size:9pt;color:#666">配'+esc(sp.name)+'</span>';
+    s+='</div>';
+    var ch=getCh(root);
+    if(ch.length){
+      s+='<div style="border-left:2px solid #999;margin-left:8px;padding-left:12px">';
+      ch.forEach(function(c){s+=renderBlock(c,depth+1)});
+      s+='</div>';
+    }
+    s+='</div>';
+    return s;
+  }
+  roots.forEach(function(r){h+=renderBlock(r,0)});
   return h;
 }
 
