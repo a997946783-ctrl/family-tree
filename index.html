@@ -1334,17 +1334,24 @@ function doSetRel(mode){
   if(!a||!b)return;
   if(mode==="a-parent"){
     if(a.g==="male")b.fa=a.id;else b.mo=a.id;
-    if(a.gen>=b.gen)a.gen=b.gen-1;
+    cascadeGen(b,a.gen+1);
   }else if(mode==="a-child"){
     if(b.g==="male")a.fa=b.id;else a.mo=b.id;
-    if(a.gen<=b.gen)a.gen=b.gen+1;
+    cascadeGen(a,b.gen+1);
   }else if(mode==="b-parent"){
     if(b.g==="male")a.fa=b.id;else a.mo=b.id;
-    if(b.gen>=a.gen)b.gen=a.gen-1;
+    cascadeGen(a,b.gen+1);
   }else if(mode==="spouse"){
     a.sp=[b.id];b.sp=[a.id];
+    if(a.gen!==b.gen)cascadeGen(b,a.gen);
   }
   saveData();renderTree();closeModal();toast("关系已设置");
+}
+function cascadeGen(m,newGen){
+  if(m.gen===newGen)return;
+  var oldGen=m.gen;m.gen=newGen;
+  var diff=newGen-oldGen;
+  getCh(m).forEach(function(c){cascadeGen(c,c.gen+diff)});
 }
 
 
