@@ -1274,6 +1274,80 @@ function fitWidth(){
 function expandAll(){_collapsed.clear();renderTree()}
 function collapseAll(){D.mem.forEach(function(m){if(getCh(m).length)_collapsed.add(m.id)});renderTree()}
 
+// ==================== Drag & Drop ====================
+var _dragFrom=null,_dragLine=null;
+function initDrag(){
+  document.addEventListener("mousedown",function(e){
+    var node=e.target.closest(".node");
+    if(!node||e.target.closest(".quick-add")||e.target.closest(".collapse-toggle"))return;
+    var id=node.dataset.id;if(!id)return;
+    _dragFrom=id;node.classList.add("dragging");
+    _dragLine=document.createElementNS("http://www.w3.org/2000/svg","svg");
+    _dragLine.classList.add("drag-line");
+    var r=node.getBoundingClientRect();
+    _dragLine.innerHTML="<line x1=\""+(r.left+r.width/2)+"\" y1=\""+(r.top+r.height/2)+"\" x2=\""+e.clientX+"\" y2=\""+e.clientY+"\"/>";
+    document.body.appendChild(_dragLine);
+    e.preventDefault();
+  });
+  document.addEventListener("mousemove",function(e){
+    if(!_dragFrom||!_dragLine)return;
+    var ln=_dragLine.querySelector("line");
+    var n=document.querySelector(".node[data-id=\""+_dragFrom+"\"]");
+    if(n&&ln){var r=n.getBoundingClientRect();ln.setAttribute("x1",r.left+r.width/2);ln.setAttribute("y1",r.top+r.height/2);ln.setAttribute("x2",e.clientX);ln.setAttribute("y2",e.clientY)}
+    document.querySelectorAll(".node.drag-over").forEach(function(el){el.classList.remove("drag-over")});
+    var tgt=document.elementFromPoint(e.clientX,e.clientY);
+    if(tgt){var tn=tgt.closest(".node");if(tn&&tn.dataset.id&&tn.dataset.id!==_dragFrom)tn.classList.add("drag-over")}
+  });
+  document.addEventListener("mouseup",function(e){
+    if(!_dragFrom)return;
+    document.querySelectorAll(".node.dragging").forEach(function(el){el.classList.remove("dragging")});
+    document.querySelectorAll(".node.drag-over").forEach(function(el){el.classList.remove("drag-over")});
+    if(_dragLine){_dragLine.remove();_dragLine=null}
+    var tgt=document.elementFromPoint(e.clientX,e.clientY);
+    if(tgt){var tn=tgt.closest(".node");if(tn&&tn.dataset.id&&tn.dataset.id!==_dragFrom)showRelPicker(_dragFrom,tn.dataset.id)}
+    _dragFrom=null;
+  });
+}
+initDrag();
+function showRelPicker(fromId,toId){
+  var from=find(fromId),to=find(toId);
+  if(!from||!to)return;
+  window._relA=fromId;window._relB=toId;
+  var opts=[
+    {mode:"a-parent",label:"↑ "+esc(from.name)+" 是 "+esc(to.name)+" 的父/母"},
+    {mode:"a-child",label:"↓ "+esc(from.name)+" 是 "+esc(to.name)+" 的子女"},
+    {mode:"spouse",label:"↔ 配偶关系"},
+    {mode:"b-parent",label:"↑ "+esc(to.name)+" 是 "+esc(from.name)+" 的父/母"}
+  ];
+  var h="<h3>设置关系</h3>";
+  h+="<p style='text-align:center;margin-bottom:20px;font-size:.9rem'><b>"+esc(from.name)+"</b> → <b>"+esc(to.name)+"</b></p>";
+  h+="<div style='display:flex;flex-direction:column;gap:10px'>";
+  opts.forEach(function(o){
+    h+="<button class='btn btn-ghost' onclick='doSetRel(\""+o.mode+"\")'>"+o.label+"</button>";
+  });
+  h+="<button class='btn btn-danger' onclick='closeModal()'>取消</button>";
+  h+="</div>";
+  document.getElementById("modalBody").innerHTML=h;openModal();
+}
+function doSetRel(mode){
+  var a=find(window._relA),b=find(window._relB);
+  if(!a||!b)return;
+  if(mode==="a-parent"){
+    if(a.g==="male")b.fa=a.id;else b.mo=a.id;
+    if(a.gen>=b.gen)a.gen=b.gen-1;
+  }else if(mode==="a-child"){
+    if(b.g==="male")a.fa=b.id;else a.mo=b.id;
+    if(a.gen<=b.gen)a.gen=b.gen+1;
+  }else if(mode==="b-parent"){
+    if(b.g==="male")a.fa=b.id;else a.mo=b.id;
+    if(b.gen>=a.gen)b.gen=a.gen-1;
+  }else if(mode==="spouse"){
+    a.sp=[b.id];b.sp=[a.id];
+  }
+  saveData();renderTree();closeModal();toast("关系已设置");
+}
+
+
 function initTouchZoom(){
   var panel=document.getElementById('treePanel');
   if(!panel)return;
