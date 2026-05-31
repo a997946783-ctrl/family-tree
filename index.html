@@ -22,7 +22,7 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .side-panel{position:fixed;z-index:160;width:340px;max-height:70vh;background:var(--paper);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-xl);display:none;flex-direction:column;overflow:hidden;animation:modalIn .25s var(--ease)}
 .side-panel.show{display:flex}
 .side-panel.collapsed{display:none}
-.tree-container{min-width:min-content;padding:20px;will-change:transform}
+.tree-container{min-width:min-content;padding:20px;will-change:transform;position:relative}
 .tree-hint{text-align:center;color:var(--sub);padding:80px 24px;font-size:.95rem;line-height:2.2}
 .tree-hint p:first-child{font-size:1.3rem;font-weight:600;color:var(--ink);margin-bottom:8px}
 .tree-hint em{color:var(--red);font-style:normal;font-weight:700;border-bottom:2px solid var(--gold-light);padding-bottom:1px}
@@ -30,19 +30,14 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
 .tree-branch{display:flex;flex-direction:column;align-items:center;position:relative}
 .tree-node-wrap{position:relative;z-index:1}
 .tree-node-wrap .couple{display:flex;align-items:center;gap:0}
+.tree-connectors{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.tree-connectors line{stroke:var(--tree-line);stroke-width:2}
 .drag-line{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9999}
 .drag-line line{stroke:var(--red);stroke-width:2;stroke-dasharray:6 4}
 @keyframes snap-pulse{0%,100%{opacity:.6}50%{opacity:1}}
 .node.dragging{outline:2px dashed var(--red);outline-offset:2px;opacity:.7}
 .node.drag-over{outline:2px solid var(--gold);outline-offset:2px;background:var(--gold-faint)}
 .tree-children{display:flex;justify-content:center;gap:20px;margin-top:30px;position:relative}
-.tree-branch.has-children>.tree-node-wrap::after{content:"";position:absolute;bottom:-38px;left:50%;width:2px;height:38px;background:var(--tree-line);transform:translateX(-50%)}
-.tree-children>.tree-branch::before{content:"";position:absolute;top:-30px;left:50%;width:2px;height:30px;background:var(--tree-line);transform:translateX(-50%)}
-.tree-children>.tree-branch::after{content:"";position:absolute;top:-30px;height:2px;background:var(--tree-line)}
-.tree-children>.tree-branch:first-child::after{left:50%;right:0}
-.tree-children>.tree-branch:last-child::after{left:0;right:50%}
-.tree-children>.tree-branch:first-child:last-child::after{display:none}
-.tree-children>.tree-branch:not(:first-child):not(:last-child)::after{left:0;right:0}
 .node{padding:10px 16px;border:1.5px solid var(--border);border-radius:var(--radius-md);background:linear-gradient(180deg,var(--paper) 0%,var(--paper-alt) 100%);text-align:center;cursor:pointer;transition:all .25s var(--ease);min-width:90px;max-width:180px;position:relative;box-shadow:var(--shadow-sm);user-select:none}
 .node:hover{border-color:var(--red-light);box-shadow:var(--shadow-lg);transform:translateY(-3px)}
 .node:focus{outline:2px solid var(--red);outline-offset:3px}
@@ -174,6 +169,17 @@ body{font-family:"Noto Serif SC","PingFang SC","Microsoft YaHei","Noto Sans SC",
   .app{display:block!important;height:auto!important;overflow:visible!important}
   .tree-panel{padding:0!important;overflow:visible!important;background:#fff!important}
   .tree-container{margin:0 auto}
+  .tree-branch{transform:none!important}
+  .tree-connectors{display:none!important}
+  .tree-children{margin-top:20px}
+  .tree-branch.has-children>.tree-node-wrap::after{content:"";position:absolute;bottom:-28px;left:50%;width:2px;height:28px;background:#bbb;transform:translateX(-50%)}
+  .tree-node-wrap{position:relative}
+  .tree-children>.tree-branch::before{content:"";position:absolute;top:-20px;left:50%;width:2px;height:20px;background:#bbb;transform:translateX(-50%)}
+  .tree-children>.tree-branch::after{content:"";position:absolute;top:-20px;height:2px;background:#bbb}
+  .tree-children>.tree-branch:first-child::after{left:50%;right:0}
+  .tree-children>.tree-branch:last-child::after{left:0;right:50%}
+  .tree-children>.tree-branch:first-child:last-child::after{display:none}
+  .tree-children>.tree-branch:not(:first-child):not(:last-child)::after{left:0;right:0}
   .node{box-shadow:none!important;border:1.5px solid #999!important;background:#fff!important;transform:none!important;padding:8px 14px;page-break-inside:avoid}
   .node.male{border-left:3px solid #555!important}
   .node.female{border-left:3px solid #c77!important}
@@ -702,6 +708,59 @@ function nCN(n){return['','一','二','三','四','五','六','七','八','九',
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 // ==================== Tree Rendering ====================
+function drawConnectors(){
+  var container=document.getElementById('treeContainer');
+  if(!container)return;
+  var old=container.querySelector('.tree-connectors');
+  if(old)old.remove();
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','tree-connectors');
+  var cRect=container.getBoundingClientRect();
+  container.querySelectorAll('.tree-branch.has-children').forEach(function(branch){
+    var wrap=branch.querySelector(':scope>.tree-node-wrap');
+    if(!wrap)return;
+    var pNode=wrap.querySelector(':scope .couple .node');
+    if(!pNode)return;
+    var childrenDiv=branch.querySelector(':scope>.tree-children');
+    if(!childrenDiv)return;
+    var childBranches=childrenDiv.querySelectorAll(':scope>.tree-branch');
+    if(!childBranches.length)return;
+    var pr=pNode.getBoundingClientRect();
+    var px=(pr.left+pr.right)/2-cRect.left;
+    var py=pr.bottom-cRect.top;
+    var firstCx,lastCx,c_arr=[];
+    childBranches.forEach(function(cb){
+      var cn=cb.querySelector(':scope .couple .node');
+      if(!cn)return;
+      var cr=cn.getBoundingClientRect();
+      var cx=(cr.left+cr.right)/2-cRect.left;
+      var ct=cr.top-cRect.top;
+      c_arr.push({x:cx,y:ct});
+      if(firstCx===undefined||cx<firstCx)firstCx=cx;
+      if(lastCx===undefined||cx>lastCx)lastCx=cx;
+    });
+    if(!c_arr.length)return;
+    var midY=(py+c_arr[0].y)/2;
+    var v1=document.createElementNS('http://www.w3.org/2000/svg','line');
+    v1.setAttribute('x1',px);v1.setAttribute('y1',py);
+    v1.setAttribute('x2',px);v1.setAttribute('y2',midY);
+    svg.appendChild(v1);
+    if(c_arr.length>1){
+      var h=document.createElementNS('http://www.w3.org/2000/svg','line');
+      h.setAttribute('x1',firstCx);h.setAttribute('y1',midY);
+      h.setAttribute('x2',lastCx);h.setAttribute('y2',midY);
+      svg.appendChild(h);
+    }
+    c_arr.forEach(function(c){
+      var v2=document.createElementNS('http://www.w3.org/2000/svg','line');
+      v2.setAttribute('x1',c.x);v2.setAttribute('y1',midY);
+      v2.setAttribute('x2',c.x);v2.setAttribute('y2',c.y);
+      svg.appendChild(v2);
+    });
+  });
+  if(svg.childNodes.length)container.appendChild(svg);
+}
+
 function renderTree(){
   if(_posDragging)return; // skip re-render during position drag
   var el=document.getElementById('treeContainer');
@@ -729,7 +788,8 @@ function renderFamily(m){
   var isCollapsed=_collapsed.has(m.id);
   var hasKids=ch.length>0&&!isCollapsed;
   var cls='tree-branch'+(hasKids?' has-children':'');
-  var s='<div class="'+cls+'">';
+  var tf=(m.ox||m.oy)?' style="transform:translate('+(m.ox||0)+'px,'+(m.oy||0)+'px)\"':'';
+  var s='<div class="'+cls+'"'+tf+'>';
   s+='<div class="tree-node-wrap"><div class="couple">';
   s+=renderNode(m,ch.length>0,isCollapsed);
   if(sp)s+='<div class="spouse-line"></div>'+renderNode(sp,false,false,m.id);
@@ -745,8 +805,7 @@ function renderFamily(m){
 function handleNodeKey(e,id){if(e.key==='Enter')selectNode(id)}
 function renderNode(m,hasCh,isCollapsed,familyId){
   var dragId=familyId||m.id;
-  var tf=(m.ox||m.oy)?' style="transform:translate('+(m.ox||0)+'px,'+(m.oy||0)+'px)"':'';
-  return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" data-id="'+dragId+'"'+tf+' tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
+    return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" data-id="'+dragId+'" tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
     +'<button class="node-del" onclick="event.stopPropagation();delM(\''+m.id+'\')" title="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'
     +'<div class="node-gen">'+genN(m.gen)+'世</div>'
     +'<div class="name">'+esc(m.name)+'</div>'
@@ -1332,6 +1391,7 @@ function applyTransform(){
   if(!c)return;
   c.style.transform='translate('+_panX+'px,'+_panY+'px) scale('+_zoom+')';
   c.style.transformOrigin='0 0';
+  requestAnimationFrame(drawConnectors);
 }
 
 function zoomTree(factor){
