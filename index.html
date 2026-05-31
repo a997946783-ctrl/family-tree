@@ -700,7 +700,7 @@ function renderFamily(m){
 function handleNodeKey(e,id){if(e.key==='Enter')selectNode(id)}
 function renderNode(m,hasCh,isCollapsed,familyId){
   var dragId=familyId||m.id;
-  var tf=(m.ox||m.oy)?' style="transform:translate('+(m.ox||0)+'px,'+(m.oy||0)+'px)"':'';
+  var tf=(m.ox!=null||m.oy!=null)?' style="position:fixed;left:'+(m.ox||0)+'px;top:'+(m.oy||0)+'px;z-index:9999"':'';
   return '<div class="node '+(m.g==='male'?'male':'female')+(selectedId===m.id?' selected':'')+'" data-id="'+dragId+'"'+tf+' tabindex="0" onclick="selectNode(\''+m.id+'\')" onkeydown="handleNodeKey(event,\''+m.id+'\')">'
     +'<div class="node-gen">'+genN(m.gen)+'世</div>'
     +'<div class="name">'+esc(m.name)+'</div>'
@@ -1300,7 +1300,9 @@ function initDrag(){
     var id=node.dataset.id;if(!id)return;
     if(e.shiftKey){
       var m=find(id);if(!m)return;
-      _posDrag={id:id,startX:e.clientX,startY:e.clientY,ox:m.ox||0,oy:m.oy||0};
+      var rect=node.getBoundingClientRect();
+      var c=document.getElementById('treeContainer').getBoundingClientRect();
+      _posDrag={id:id,startX:e.clientX,startY:e.clientY,ox:rect.left-c.left,oy:rect.top-c.top};
       node.style.cursor='grabbing';
       e.preventDefault();return;
     }
@@ -1318,9 +1320,9 @@ function initDrag(){
     if(_posDrag){
       var m=find(_posDrag.id);if(!m)return;
       var node=document.querySelector('.node[data-id="'+_posDrag.id+'"]');
-      m.ox=_posDrag.ox+(e.clientX-_posDrag.startX);
-      m.oy=_posDrag.oy+(e.clientY-_posDrag.startY);
-      if(node)node.style.transform='translate('+m.ox+'px,'+m.oy+'px)';
+      m.ox=Math.round(_posDrag.ox+(e.clientX-_posDrag.startX));
+      m.oy=Math.round(_posDrag.oy+(e.clientY-_posDrag.startY));
+      if(node){node.style.position='fixed';node.style.left=m.ox+'px';node.style.top=m.oy+'px';node.style.zIndex='9999'}
       return;
     }
     if(!_dragFrom||!_dragLine)return;
