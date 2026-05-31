@@ -725,6 +725,7 @@ function selectNode(id){
 function closeSidePanel(){
   selectedId=null;
   document.getElementById('sidePanel').classList.remove('show');
+  document.getElementById('sidePanel').classList.add('collapsed');
   renderTree();
 }
 function showDetailPanel(id){
@@ -751,6 +752,7 @@ function showDetailPanel(id){
     panel.style.left=left+'px';
     panel.style.top=top+'px';
   }
+  panel.classList.remove('collapsed');
   panel.classList.add('show');
 }
 function swTab(btn,tab){
