@@ -738,22 +738,24 @@ function showDetailPanel(id){
   h+='<div class="panel-body" id="tabCt"></div>';
   p.innerHTML=h;
   showDetail(m);
-  // Position next to the node
-  var nodeEl=document.querySelector('.node.selected');
-  if(!nodeEl)nodeEl=document.querySelector('.node[data-id="'+m.id+'"]');
-  if(nodeEl){
-    var r=nodeEl.getBoundingClientRect();
-    var pw=340,ph=panel.offsetHeight||400;
-    var left=r.right+12,top=r.top;
-    if(left+pw>window.innerWidth-10)left=r.left-pw-12;
-    if(left<10)left=10;
-    if(top+ph>window.innerHeight-10)top=window.innerHeight-ph-10;
-    if(top<10)top=10;
-    panel.style.left=left+'px';
-    panel.style.top=top+'px';
-  }
   panel.classList.remove('collapsed');
   panel.classList.add('show');
+  // Position next to the node (wait for DOM to update)
+  requestAnimationFrame(function(){
+    var nodeEl=document.querySelector('.node.selected');
+    if(!nodeEl)nodeEl=document.querySelector('.node[data-id="'+m.id+'"]');
+    if(nodeEl){
+      var r=nodeEl.getBoundingClientRect();
+      var pw=340,ph=panel.offsetHeight||400;
+      var left=r.right+12,top=r.top;
+      if(left+pw>window.innerWidth-10)left=r.left-pw-12;
+      if(left<10)left=10;
+      if(top+ph>window.innerHeight-10)top=window.innerHeight-ph-10;
+      if(top<10)top=10;
+      panel.style.left=left+'px';
+      panel.style.top=top+'px';
+    }
+  });
 }
 function swTab(btn,tab){
   document.querySelectorAll('.panel-tabs button').forEach(function(b){b.classList.remove('on')});
@@ -1103,7 +1105,7 @@ function addMsg(role,text){
   el.scrollTop=el.scrollHeight;
   return d;
 }
-function updateMsg(el,text){if(el)el.textContent=text}
+function updateMsg(el,text){if(el)el.innerHTML=text}
 
 function showSettingsModal(){
   var h='<h3><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span> 设置</h3>';
@@ -1332,12 +1334,8 @@ function findNearestNode(x,y,excludeId){
 function autoRelType(fromId,snap){
   var from=find(fromId),to=find(snap.id);
   if(!from||!to)return null;
-  var dy=snap.cy-(snap.rect.top+snap.rect.height/2);
-  var oy=snap.cy;
-  var dx=snap.cx;
   var draggedRect=document.querySelector('.node[data-id="'+fromId+'"]').getBoundingClientRect();
   var dragY=draggedRect.top+draggedRect.height/2;
-  var dragX=draggedRect.left+draggedRect.width/2;
   var dy2=dragY-snap.cy;
   if(Math.abs(dy2)>60){
     if(dy2<0)return{mode:'a-parent',label:from.name+' → '+to.name+' 父/母'};
@@ -1742,7 +1740,7 @@ function tplRecord(css,tt,sub){
       if(m.bi)t+='生于公元'+m.bi+'年';
       if(m.de){t+='，卋于'+m.de+'年';var a=parseInt(m.de)-parseInt(m.bi);if(a>0)t+='，享年'+a+'岁'}
       t+='。';
-      if(sp){t+='配'+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
+      if(sp){t+=(m.g==='female'?'适':'配')+sp.name;if(sp.bi)t+='，生于'+sp.bi+'年';t+='。'}
       if(sons.length){t+='子'+nCN(sons.length)+'：';sons.forEach(function(s,i){if(i>0)t+='，';t+=(i===0?'长':'次')+s.name});t+='。'}
       if(dgs.length){t+='女'+nCN(dgs.length)+'：';dgs.forEach(function(d,i){if(i>0)t+='，';t+=d.name});t+='。'}
       if(m.bu)t+='葭于'+m.bu+'。';
